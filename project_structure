@@ -1,0 +1,8 @@
+worship.direct/
+├── index.html               # Landing page (optional)
+├── bible/
+│   ├── kjv.json             # Full Bible as JSON
+│   └── asv.json             # Optional alternate version
+├── js/
+│   └── api.js               # Client-side script for verse access
+└── ...
