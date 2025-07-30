@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+        // Store the path to redirect back to after loading index.html
+        const path = window.location.pathname;
+        const queryParams = window.location.search;
+        sessionStorage.setItem('redirectPath', path + queryParams);
+        window.location.href = '/';
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
