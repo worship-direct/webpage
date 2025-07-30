@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resultBox.innerHTML = "<p>Loading verse...</p>";
 
     try {
-      const url = `bible/${version}.json`;
+      const url = `https://worship.direct/bible/${version}.json`;
       const response = await fetch(url);
       
       if (!response.ok) {
