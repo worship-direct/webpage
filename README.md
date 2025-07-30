@@ -6,12 +6,19 @@ Welcome to the **Worship Direct Bible API**. This is a static JSON-based API hos
 
 ## 🌐 API Endpoints
 
-| Version | URL |
-|---------|-----|
-| **KJV** | [`https://worship.direct/bible/kjv.json`](https://worship.direct/bible/kjv.json) |
-| **ASV** | [`https://worship.direct/bible/asv.json`](https://worship.direct/bible/asv.json) |
+### Nested Format (Recommended)
+| Version | URL | Format |
+|---------|-----|--------|
+| **KJV** | [`https://worship.direct/bible/kjv_nested.json`](https://worship.direct/bible/kjv_nested.json) | Nested |
+| **ASV** | [`https://worship.direct/bible/asv_nested.json`](https://worship.direct/bible/asv_nested.json) | Nested |
 
-Each file contains the full Bible structured as nested JSON objects:
+### Original Format (Legacy)
+| Version | URL | Format |
+|---------|-----|--------|
+| **KJV** | [`https://worship.direct/bible/kjv.json`](https://worship.direct/bible/kjv.json) | Flat key-value |
+| **ASV** | [`https://worship.direct/bible/asv.json`](https://worship.direct/bible/asv.json) | Complex resultset |
+
+The **nested format** files are structured as nested JSON objects for easy REST API compatibility:
 
 ```json
 {
@@ -27,11 +34,11 @@ Each file contains the full Bible structured as nested JSON objects:
 
 ## ✅ How to Use the API
 
-### 📄 HTML/JavaScript Example
+### 📄 HTML/JavaScript Example (Nested Format)
 
 ```html
 <script>
-  fetch('https://worship.direct/bible/kjv.json')
+  fetch('https://worship.direct/bible/kjv_nested.json')
     .then(res => res.json())
     .then(data => {
       const verse = data["John"]["3"]["16"];
@@ -40,13 +47,13 @@ Each file contains the full Bible structured as nested JSON objects:
 </script>
 ```
 
-### 🐍 Python Example
+### 🐍 Python Example (Nested Format)
 
 ```python
 import requests
 
 def get_verse(version, book, chapter, verse):
-    url = f"https://worship.direct/bible/{version}.json"
+    url = f"https://worship.direct/bible/{version}_nested.json"
     res = requests.get(url)
     if res.status_code != 200:
         return "Error loading Bible JSON"
@@ -57,14 +64,14 @@ def get_verse(version, book, chapter, verse):
 print(get_verse("kjv", "John", 3, 16))
 ```
 
-### 🟦 Node.js Example
+### 🟦 Node.js Example (Nested Format)
 
 ```javascript
 const axios = require('axios');
 
 async function getVerse(version, book, chapter, verse) {
   try {
-    const res = await axios.get(`https://worship.direct/bible/${version}.json`);
+    const res = await axios.get(`https://worship.direct/bible/${version}_nested.json`);
     const data = res.data;
     const text = data?.[book]?.[chapter]?.[verse];
     console.log(`${book} ${chapter}:${verse} (${version.toUpperCase()}):`, text || "Not found");
@@ -78,7 +85,30 @@ getVerse("kjv", "John", "3", "16");
 
 ---
 
-## 🧰 File Structure Suggestion for GitHub Pages
+## 🛠️ Reformatting Scripts
+
+The repository includes scripts to convert Bible JSON files to the standardized nested format:
+
+### Available Scripts
+- **Python**: `scripts/convert_asv_to_nested.py` and `scripts/convert_kjv_to_nested.py`
+- **Node.js**: `scripts/convert_asv_to_nested.js` and `scripts/convert_kjv_to_nested.js`
+
+### Usage
+```bash
+# Python
+python3 scripts/convert_asv_to_nested.py
+python3 scripts/convert_kjv_to_nested.py
+
+# Node.js
+node scripts/convert_asv_to_nested.js
+node scripts/convert_kjv_to_nested.js
+```
+
+See [`scripts/README.md`](scripts/README.md) for detailed documentation.
+
+---
+
+## 🧰 File Structure
 
 ```
 /worship.direct/
@@ -86,8 +116,16 @@ getVerse("kjv", "John", "3", "16");
 ├── js/
 │   └── api.js
 ├── bible/
-│   ├── kjv.json
-│   └── asv.json
+│   ├── kjv.json          # Original flat format
+│   ├── asv.json          # Original resultset format
+│   ├── kjv_nested.json   # Nested format (recommended)
+│   └── asv_nested.json   # Nested format (recommended)
+├── scripts/              # Conversion scripts
+│   ├── README.md
+│   ├── convert_kjv_to_nested.py
+│   ├── convert_asv_to_nested.py
+│   ├── convert_kjv_to_nested.js
+│   └── convert_asv_to_nested.js
 └── README.md ← (this file)
 ```
 
