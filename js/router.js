@@ -58,42 +58,31 @@ function fetchVerse(version, book, chapter, verse) {
   const result = document.getElementById('result');
   result.innerHTML = `<p>Loading ${book} ${chapter}:${verse} from ${version.toUpperCase()}...</p>`;
   
-  // Implement your verse fetching logic here
-  // This should match the API calls you're already making in api.js
-  // For example:
-  
-  // Example 1: If you have a public API endpoint
-  fetch(`https://api.worship.direct/bible/${version}/${book}/${chapter}/${verse}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Verse not found');
-      }
-      return response.json();
-    })
-    .then(data => {
-      displayVerse(result, version, book, chapter, verse, data.text);
-    })
-    .catch(error => {
-      result.innerHTML = `
-        <p class="error">Error: ${error.message}</p>
-        <p><a href="/">Return to verse lookup</a></p>
-      `;
-    });
-    
-  /* 
-  // Example 2: If you're using a local database or other method from your api.js
-  try {
-    // Call your existing function to get the verse
-    getVerse(version, book, chapter, verse, (data) => {
+  // Use the global getVerse function from api.js if it exists
+  if (typeof window.getVerse === 'function') {
+    window.getVerse(version, book, chapter, verse, (data) => {
       displayVerse(result, version, book, chapter, verse, data.text);
     });
-  } catch (error) {
-    result.innerHTML = `
-      <p class="error">Error: ${error.message}</p>
-      <p><a href="/">Return to verse lookup</a></p>
-    `;
+  } else {
+    // Fallback if api.js hasn't been updated to expose getVerse
+    fetch(`https://api.worship.direct/bible/${version}/${book}/${chapter}/${verse}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Verse not found');
+        }
+        return response.json();
+      })
+      .then(data => {
+        displayVerse(result, version, book, chapter, verse, data.text);
+      })
+      .catch(error => {
+        result.innerHTML = `
+          <p class="error">Error: ${error.message}</p>
+          <p><a href="/">Return to verse lookup</a></p>
+        `;
+        console.error('API error:', error);
+      });
   }
-  */
 }
 
 function displayVerse(container, version, book, chapter, verse, text) {
