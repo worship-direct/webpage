@@ -166,10 +166,19 @@
 
     // Normalize book name for lookup
     function normalizeBookName(book) {
-      // Capitalize first letter of each word
-      return book.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      ).join(' ');
+      // Words that should remain lowercase (except when first word)
+      const lowercaseWords = new Set(['of', 'the', 'and']);
+      
+      // Capitalize first letter of each word, except common lowercase words
+      const words = book.split(' ');
+      return words.map((word, index) => {
+        const lowerWord = word.toLowerCase();
+        // Always capitalize the first word, otherwise check if it should be lowercase
+        if (index === 0 || !lowercaseWords.has(lowerWord)) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+        return lowerWord;
+      }).join(' ');
     }
 
     // Get verses from the Bible data
