@@ -37,13 +37,13 @@ jobs:
 
       - name: Create version.json
         run: |
-          cat > version.json << EOF
-          {
-            "version": "${{ steps.version.outputs.VERSION }}",
-            "commit": "${{ steps.version.outputs.COMMIT_SHA }}",
-            "timestamp": "${{ steps.version.outputs.TIMESTAMP }}"
-          }
-          EOF
+          # Use jq to create properly escaped JSON
+          jq -n \
+            --arg version "${{ steps.version.outputs.VERSION }}" \
+            --arg commit "${{ steps.version.outputs.COMMIT_SHA }}" \
+            --arg timestamp "${{ steps.version.outputs.TIMESTAMP }}" \
+            '{version: $version, commit: $commit, timestamp: $timestamp}' \
+            > version.json
           cat version.json
 
       - name: Commit version.json

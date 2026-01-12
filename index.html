@@ -105,15 +105,24 @@
         // Clear existing content
         versionDisplay.textContent = '';
         
+        // Validate data format to prevent XSS
+        const version = String(data.version).replace(/[^0-9]/g, '');
+        const commit = String(data.commit).replace(/[^a-f0-9]/g, '').substring(0, 7);
+        const timestamp = String(data.timestamp).substring(0, 100); // Limit length
+        
+        if (!version || !commit || !timestamp) {
+          throw new Error('Invalid version data');
+        }
+        
         // Build version display safely using DOM manipulation
         versionDisplay.appendChild(document.createTextNode('Version '));
         
         const versionSpan = document.createElement('span');
         versionSpan.className = 'version-number';
-        versionSpan.textContent = 'v' + data.version;
+        versionSpan.textContent = 'v' + version;
         versionDisplay.appendChild(versionSpan);
         
-        versionDisplay.appendChild(document.createTextNode(' | Commit ' + data.commit + ' | ' + data.timestamp));
+        versionDisplay.appendChild(document.createTextNode(' | Commit ' + commit + ' | ' + timestamp));
       })
       .catch(error => {
         console.error('Error loading version:', error);
