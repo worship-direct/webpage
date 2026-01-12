@@ -46,9 +46,9 @@ function handleRoute(path) {
   let decodedPath;
   try {
     decodedPath = decodeURIComponent(path);
-  } catch (e) {
+  } catch (error) {
     // If decoding fails, use the original path
-    console.error('Failed to decode URL path:', e);
+    console.error('Failed to decode URL path:', error);
     decodedPath = path;
   }
   
@@ -74,8 +74,13 @@ function handleRoute(path) {
       const [, version, reference] = match;
       
       // Try to parse "Book Chapter Verse" format (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
-      // Use non-greedy match (.+?) to capture the book name (which may contain numbers and spaces)
-      // Ensure book name ends with non-whitespace character to avoid trailing spaces
+      // Regex breakdown:
+      // - (.+?\S) = Non-greedy capture of book name (one or more chars ending with non-whitespace)
+      // - \s+ = One or more whitespace characters separating book from chapter
+      // - (\d+) = Chapter number (one or more digits)
+      // - \s+ = One or more whitespace characters separating chapter from verse
+      // - (\d+) = Verse number (one or more digits)
+      // This handles multi-word books like "1 John" or "Song of Solomon"
       const refMatch = reference.match(/^(.+?\S)\s+(\d+)\s+(\d+)$/);
       
       if (refMatch) {
