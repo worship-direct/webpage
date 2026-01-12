@@ -39,6 +39,19 @@
     .github-link svg {
       margin-right: 8px;
     }
+    
+    /* Version display styling */
+    .version-info {
+      text-align: center;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      color: #666;
+      font-size: 0.85rem;
+    }
+    .version-info .version-number {
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -74,5 +87,24 @@
       <span>View on GitHub</span>
     </a>
   </div>
+  
+  <!-- Version information -->
+  <div class="version-info">
+    <span id="version-display">Loading version...</span>
+  </div>
+  
+  <script>
+    // Fetch and display version information
+    fetch('version.json')
+      .then(response => response.json())
+      .then(data => {
+        const versionDisplay = document.getElementById('version-display');
+        versionDisplay.innerHTML = `Version <span class="version-number">v${data.version}</span> | Commit ${data.commit} | ${data.timestamp}`;
+      })
+      .catch(error => {
+        console.error('Error loading version:', error);
+        document.getElementById('version-display').textContent = 'Version info unavailable';
+      });
+  </script>
 </body>
 </html>
