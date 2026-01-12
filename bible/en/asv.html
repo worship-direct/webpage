@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASV Bible Verse Lookup</title>
+  <style>
+    body { 
+      font-family: Georgia, serif; 
+      padding: 2rem; 
+      background: #f9f9f9; 
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+    h1 { 
+      color: #333; 
+      border-bottom: 2px solid #666;
+      padding-bottom: 0.5rem;
+    }
+    #result { 
+      margin-top: 2rem; 
+      padding: 1.5rem; 
+      background: #fff; 
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .verse { 
+      font-size: 1.2rem; 
+      line-height: 1.8;
+      margin-bottom: 0.5rem;
+    }
+    .verse-number {
+      font-weight: bold;
+      color: #666;
+      font-size: 0.9em;
+      vertical-align: super;
+      margin-right: 0.3em;
+    }
+    .reference { 
+      font-weight: bold; 
+      margin-top: 1.5rem; 
+      color: #444;
+      font-size: 1.1rem;
+    }
+    .error { 
+      color: #d32f2f; 
+      padding: 1rem;
+      background: #ffebee;
+      border-radius: 4px;
+    }
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+    .instructions {
+      background: #e3f2fd;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .instructions code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>📖 ASV Bible Verse Lookup</h1>
+  
+  <div class="instructions">
+    <strong>How to use:</strong>
+    <ul>
+      <li>Single verse: <code>asv.html?ref=Genesis 1 1</code></li>
+      <li>Verse range (same chapter): <code>asv.html?ref=Genesis 1:1 - 1:5</code></li>
+      <li>Verse range (cross-chapter): <code>asv.html?ref=Genesis 1:1 - 3:1</code></li>
+      <li>Using hash: <code>asv.html#Genesis 1 1</code></li>
+    </ul>
+  </div>
+
+  <div id="result">
+    <p class="loading">Enter a verse reference in the URL...</p>
+  </div>
+
+  <script>
+    // Load the ASV Bible JSON data
+    let bibleData = null;
+
+    // Parse URL parameters to get the verse reference
+    function parseUrlParameters() {
+      const path = window.location.pathname;
+      const search = window.location.search;
+      const hash = window.location.hash;
+      
+      // Try to extract reference from various formats
+      // Format 1: asv.html Genesis 1 1 (space-separated after filename)
+      const afterHtml = path.split('asv.html')[1];
+      if (afterHtml && afterHtml.trim()) {
+        return decodeURIComponent(afterHtml.trim().replace(/^\//, ''));
+      }
+      
+      // Format 2: ?ref=Genesis 1 1
+      if (search) {
+        const params = new URLSearchParams(search);
+        const ref = params.get('ref');
+        if (ref) return ref;
+      }
+      
+      // Format 3: #Genesis 1 1
+      if (hash && hash.length > 1) {
+        return decodeURIComponent(hash.substring(1));
+      }
+      
+      return null;
+    }
+
+    // Parse verse reference string
+    function parseReference(refString) {
+      if (!refString) return null;
+      
+      // Check if it's a range (contains " - ")
+      const rangeMatch = refString.match(/^(.+?)\s+(\d+):(\d+)\s*-\s*(\d+):(\d+)$/);
+      if (rangeMatch) {
+        // Cross-chapter range: "Genesis 1:1 - 3:1"
+        return {
+          book: rangeMatch[1].trim(),
+          startChapter: rangeMatch[2],
+          startVerse: rangeMatch[3],
+          endChapter: rangeMatch[4],
+          endVerse: rangeMatch[5],
+          isRange: true
+        };
+      }
+      
+      const sameChapterRange = refString.match(/^(.+?)\s+(\d+):(\d+)\s*-\s*(\d+)$/);
+      if (sameChapterRange) {
+        // Same chapter range: "Genesis 1:1 - 5"
+        return {
+          book: sameChapterRange[1].trim(),
+          startChapter: sameChapterRange[2],
+          startVerse: sameChapterRange[3],
+          endChapter: sameChapterRange[2], // Same as start
+          endVerse: sameChapterRange[4],
+          isRange: true
+        };
+      }
+      
+      // Single verse: "Genesis 1 1" or "John 3 16"
+      const singleMatch = refString.match(/^(.+?)\s+(\d+)\s+(\d+)$/);
+      if (singleMatch) {
+        return {
+          book: singleMatch[1].trim(),
+          startChapter: singleMatch[2],
+          startVerse: singleMatch[3],
+          endChapter: singleMatch[2],
+          endVerse: singleMatch[3],
+          isRange: false
+        };
+      }
+      
+      return null;
+    }
+
+    // Normalize book name for lookup
+    function normalizeBookName(book) {
+      // Capitalize first letter of each word
+      return book.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ');
+    }
+
+    // Get verses from the Bible data
+    function getVerses(ref) {
+      if (!bibleData || !ref) return null;
+      
+      const book = normalizeBookName(ref.book);
+      const bookData = bibleData[book];
+      
+      if (!bookData) {
+        return { error: `Book "${book}" not found` };
+      }
+      
+      const verses = [];
+      const startChap = parseInt(ref.startChapter);
+      const endChap = parseInt(ref.endChapter);
+      const startV = parseInt(ref.startVerse);
+      const endV = parseInt(ref.endVerse);
+      
+      for (let chap = startChap; chap <= endChap; chap++) {
+        const chapterData = bookData[chap.toString()];
+        if (!chapterData) {
+          continue;
+        }
+        
+        const firstVerse = (chap === startChap) ? startV : 1;
+        const lastVerse = (chap === endChap) ? endV : Math.max(...Object.keys(chapterData).map(Number));
+        
+        for (let v = firstVerse; v <= lastVerse; v++) {
+          const verseText = chapterData[v.toString()];
+          if (verseText) {
+            verses.push({
+              book: book,
+              chapter: chap,
+              verse: v,
+              text: verseText
+            });
+          }
+        }
+      }
+      
+      return verses.length > 0 ? verses : { error: 'Verses not found' };
+    }
+
+    // Display verses
+    function displayVerses(verses, ref) {
+      const resultDiv = document.getElementById('result');
+      
+      if (!verses || verses.error) {
+        resultDiv.innerHTML = `<p class="error">Error: ${verses ? verses.error : 'Invalid reference'}</p>`;
+        return;
+      }
+      
+      let html = '<div class="verses">';
+      
+      verses.forEach(v => {
+        html += `<div class="verse"><span class="verse-number">${v.verse}</span>${v.text}</div>`;
+      });
+      
+      // Create reference string
+      let refString;
+      if (ref.isRange) {
+        if (ref.startChapter === ref.endChapter) {
+          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}-${ref.endVerse}`;
+        } else {
+          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse} - ${ref.endChapter}:${ref.endVerse}`;
+        }
+      } else {
+        refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}`;
+      }
+      
+      html += `<div class="reference">${refString} (ASV)</div>`;
+      html += '</div>';
+      
+      resultDiv.innerHTML = html;
+      document.title = `${refString} (ASV) - Worship Direct`;
+    }
+
+    // Main execution
+    async function init() {
+      const resultDiv = document.getElementById('result');
+      
+      try {
+        // Load Bible data
+        resultDiv.innerHTML = '<p class="loading">Loading ASV Bible data...</p>';
+        const response = await fetch('asv.json');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load Bible data: ${response.status}`);
+        }
+        
+        bibleData = await response.json();
+        
+        // Parse URL
+        const refString = parseUrlParameters();
+        
+        if (!refString) {
+          resultDiv.innerHTML = '<p class="error">No verse reference provided. Please add a reference to the URL.</p>';
+          return;
+        }
+        
+        const ref = parseReference(refString);
+        
+        if (!ref) {
+          resultDiv.innerHTML = `<p class="error">Invalid reference format: "${refString}"</p>`;
+          return;
+        }
+        
+        // Get and display verses
+        const verses = getVerses(ref);
+        displayVerses(verses, ref);
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        console.error('Error:', error);
+      }
+    }
+
+    // Run when page loads
+    init();
+  </script>
+</body>
+</html>
