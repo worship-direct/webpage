@@ -10,10 +10,19 @@ function normalizeBookName(book) {
 // Helper function to capitalize book names properly for display
 function capitalizeBookName(book) {
   const normalized = normalizeBookName(book);
+  // Words that should remain lowercase (except when first word)
+  const lowercaseWords = new Set(['of', 'the', 'and']);
+  
   // Split by spaces to handle multi-word books like "1 John" or "Song of Solomon"
-  return normalized
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  const words = normalized.split(' ');
+  return words
+    .map((word, index) => {
+      // Always capitalize the first word, otherwise check if it's a lowercase word
+      if (index === 0 || !lowercaseWords.has(word)) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return word;
+    })
     .join(' ');
 }
 
