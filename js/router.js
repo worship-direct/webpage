@@ -1,3 +1,38 @@
+// Regular expression pattern for parsing space-separated Bible references
+// Format: "Book Chapter Verse" (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
+// Pattern: (.+?\S) captures book name using non-greedy match that must end with non-whitespace
+// This prevents "John  " (with trailing space) from being captured as the book name
+const BIBLE_REFERENCE_PATTERN = /^(.+?\S)\s+(\d+)\s+(\d+)$/;
+
+// Helper function to create page title for Bible verses
+function createPageTitle(book, chapter, verse, version) {
+  return `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+}
+
+// Helper function to normalize book names (lowercase with single spaces)
+function normalizeBookName(book) {
+  return book.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// Helper function to capitalize book names properly for display
+function capitalizeBookName(book) {
+  const normalized = normalizeBookName(book);
+  // Words that should remain lowercase (except when first word)
+  const lowercaseWords = new Set(['of', 'the', 'and']);
+  
+  // Split by spaces to handle multi-word books like "1 John" or "Song of Solomon"
+  const words = normalized.split(' ');
+  return words
+    .map((word, index) => {
+      // Always capitalize the first word, otherwise check if it's a lowercase word
+      if (index === 0 || !lowercaseWords.has(word)) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return word;
+    })
+    .join(' ');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Check if we're redirected from 404.html with a path
   const redirectPath = sessionStorage.getItem('redirectPath');
@@ -32,8 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleRoute(path) {
-  // Check if the URL matches our expected pattern
-  const match = path.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
+  // Decode the URL to handle spaces properly, with error handling for malformed URLs
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(path);
+  } catch (error) {
+    // If decoding fails, use the original path
+    console.error('Failed to decode URL path:', error);
+    decodedPath = path;
+  }
+  
+  // Check if the URL matches the standard pattern: /bible/version/book/chapter/verse
+  let match = decodedPath.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
   
   if (match) {
     const [, version, book, chapter, verse] = match;
@@ -42,11 +87,36 @@ function handleRoute(path) {
     document.getElementById('lookup-form').style.display = 'none';
     
     // Update page title
-    document.title = `${book.charAt(0).toUpperCase() + book.slice(1)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+    document.title = createPageTitle(book, chapter, verse, version);
     
     // Fetch and display the verse
     fetchVerse(version, book, chapter, verse);
   } else {
+    // Check for alternative format: /bible/version/Book Chapter Verse (space-separated)
+    match = decodedPath.match(/\/bible\/([^\/]+)\/(.+)/);
+    
+    if (match) {
+      const [, version, reference] = match;
+      
+      // Try to parse space-separated Bible reference format using the pattern constant
+      const refMatch = reference.match(BIBLE_REFERENCE_PATTERN);
+      
+      if (refMatch) {
+        const [, book, chapter, verse] = refMatch;
+        const normalizedBook = normalizeBookName(book);
+        
+        // Redirect to the proper URL format
+        const properPath = `/bible/${version.toLowerCase()}/${normalizedBook}/${chapter}/${verse}`;
+        history.replaceState(null, '', properPath);
+        
+        // Hide the form and fetch the verse
+        document.getElementById('lookup-form').style.display = 'none';
+        document.title = createPageTitle(book, chapter, verse, version);
+        fetchVerse(version.toLowerCase(), normalizedBook, chapter, verse);
+        return;
+      }
+    }
+    
     // Show the form for the homepage
     document.getElementById('lookup-form').style.display = 'block';
     document.getElementById('result').innerHTML = '';
@@ -87,7 +157,7 @@ function fetchVerse(version, book, chapter, verse) {
 
 function displayVerse(container, version, book, chapter, verse, text) {
   // Format the book name to be properly capitalized
-  const formattedBook = book.charAt(0).toUpperCase() + book.slice(1);
+  const formattedBook = capitalizeBookName(book);
   
   container.innerHTML = `
     <div class="verse-container">
