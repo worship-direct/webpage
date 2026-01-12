@@ -96,10 +96,24 @@
   <script>
     // Fetch and display version information
     fetch('version.json')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch version');
+        return response.json();
+      })
       .then(data => {
         const versionDisplay = document.getElementById('version-display');
-        versionDisplay.innerHTML = `Version <span class="version-number">v${data.version}</span> | Commit ${data.commit} | ${data.timestamp}`;
+        // Clear existing content
+        versionDisplay.textContent = '';
+        
+        // Build version display safely using DOM manipulation
+        versionDisplay.appendChild(document.createTextNode('Version '));
+        
+        const versionSpan = document.createElement('span');
+        versionSpan.className = 'version-number';
+        versionSpan.textContent = 'v' + data.version;
+        versionDisplay.appendChild(versionSpan);
+        
+        versionDisplay.appendChild(document.createTextNode(' | Commit ' + data.commit + ' | ' + data.timestamp));
       })
       .catch(error => {
         console.error('Error loading version:', error);

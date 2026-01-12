@@ -55,5 +55,6 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Update version to ${{ steps.version.outputs.VERSION }} [skip ci]"
-            git push
+            # Use --force-with-lease to prevent overwriting concurrent changes
+            git push --force-with-lease
           fi
