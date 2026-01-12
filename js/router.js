@@ -75,11 +75,13 @@ function handleRoute(path) {
       
       // Try to parse "Book Chapter Verse" format (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
       // Use non-greedy match (.+?) to capture the book name (which may contain numbers and spaces)
-      const refMatch = reference.match(/^(.+?)\s+(\d+)\s+(\d+)$/);
+      // Ensure book name ends with non-whitespace character to avoid trailing spaces
+      const refMatch = reference.match(/^(.+?\S)\s+(\d+)\s+(\d+)$/);
       
       if (refMatch) {
         const [, book, chapter, verse] = refMatch;
-        const normalizedBook = book.trim().toLowerCase();
+        // Normalize book name: trim and replace multiple consecutive spaces with single space
+        const normalizedBook = book.trim().replace(/\s+/g, ' ').toLowerCase();
         
         // Redirect to the proper URL format
         const properPath = `/bible/${version.toLowerCase()}/${normalizedBook}/${chapter}/${verse}`;
@@ -133,7 +135,7 @@ function fetchVerse(version, book, chapter, verse) {
 
 function displayVerse(container, version, book, chapter, verse, text) {
   // Format the book name to be properly capitalized
-  const formattedBook = book.charAt(0).toUpperCase() + book.slice(1);
+  const formattedBook = capitalizeBookName(book);
   
   container.innerHTML = `
     <div class="verse-container">
