@@ -42,8 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleRoute(path) {
-  // Decode the URL to handle spaces properly
-  const decodedPath = decodeURIComponent(path);
+  // Decode the URL to handle spaces properly, with error handling for malformed URLs
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(path);
+  } catch (e) {
+    // If decoding fails, use the original path
+    console.error('Failed to decode URL path:', e);
+    decodedPath = path;
+  }
   
   // Check if the URL matches the standard pattern: /bible/version/book/chapter/verse
   let match = decodedPath.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
@@ -55,7 +62,7 @@ function handleRoute(path) {
     document.getElementById('lookup-form').style.display = 'none';
     
     // Update page title
-    document.title = `${book.charAt(0).toUpperCase() + book.slice(1)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+    document.title = `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
     
     // Fetch and display the verse
     fetchVerse(version, book, chapter, verse);
