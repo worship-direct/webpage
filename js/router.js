@@ -1,3 +1,13 @@
+// Helper function to capitalize book names properly
+function capitalizeBookName(book) {
+  const trimmedBook = book.trim();
+  // Split by spaces to handle multi-word books like "1 John" or "Song of Solomon"
+  return trimmedBook
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Check if we're redirected from 404.html with a path
   const redirectPath = sessionStorage.getItem('redirectPath');
@@ -56,20 +66,22 @@ function handleRoute(path) {
     if (match) {
       const [, version, reference] = match;
       
-      // Try to parse "Book Chapter Verse" format (e.g., "John 1 1" or "John 3 16")
-      const refMatch = reference.match(/^([a-zA-Z\s]+?)\s+(\d+)\s+(\d+)$/);
+      // Try to parse "Book Chapter Verse" format (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
+      // Use non-greedy match (.+?) to capture the book name (which may contain numbers and spaces)
+      const refMatch = reference.match(/^(.+?)\s+(\d+)\s+(\d+)$/);
       
       if (refMatch) {
         const [, book, chapter, verse] = refMatch;
+        const normalizedBook = book.trim().toLowerCase();
         
         // Redirect to the proper URL format
-        const properPath = `/bible/${version.toLowerCase()}/${book.trim().toLowerCase()}/${chapter}/${verse}`;
+        const properPath = `/bible/${version.toLowerCase()}/${normalizedBook}/${chapter}/${verse}`;
         history.replaceState(null, '', properPath);
         
         // Hide the form and fetch the verse
         document.getElementById('lookup-form').style.display = 'none';
-        document.title = `${book.trim().charAt(0).toUpperCase() + book.trim().slice(1).toLowerCase()} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
-        fetchVerse(version.toLowerCase(), book.trim().toLowerCase(), chapter, verse);
+        document.title = `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+        fetchVerse(version.toLowerCase(), normalizedBook, chapter, verse);
         return;
       }
     }
