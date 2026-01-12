@@ -1,6 +1,13 @@
 // Regular expression pattern for parsing space-separated Bible references
 // Format: "Book Chapter Verse" (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
+// Pattern: (.+?\S) captures book name using non-greedy match that must end with non-whitespace
+// This prevents "John  " (with trailing space) from being captured as the book name
 const BIBLE_REFERENCE_PATTERN = /^(.+?\S)\s+(\d+)\s+(\d+)$/;
+
+// Helper function to create page title for Bible verses
+function createPageTitle(book, chapter, verse, version) {
+  return `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+}
 
 // Helper function to normalize book names (lowercase with single spaces)
 function normalizeBookName(book) {
@@ -80,7 +87,7 @@ function handleRoute(path) {
     document.getElementById('lookup-form').style.display = 'none';
     
     // Update page title
-    document.title = `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+    document.title = createPageTitle(book, chapter, verse, version);
     
     // Fetch and display the verse
     fetchVerse(version, book, chapter, verse);
@@ -104,7 +111,7 @@ function handleRoute(path) {
         
         // Hide the form and fetch the verse
         document.getElementById('lookup-form').style.display = 'none';
-        document.title = `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+        document.title = createPageTitle(book, chapter, verse, version);
         fetchVerse(version.toLowerCase(), normalizedBook, chapter, verse);
         return;
       }
