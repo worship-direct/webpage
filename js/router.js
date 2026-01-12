@@ -1,10 +1,19 @@
-// Helper function to capitalize book names properly
+// Regular expression pattern for parsing space-separated Bible references
+// Format: "Book Chapter Verse" (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
+const BIBLE_REFERENCE_PATTERN = /^(.+?\S)\s+(\d+)\s+(\d+)$/;
+
+// Helper function to normalize book names (lowercase with single spaces)
+function normalizeBookName(book) {
+  return book.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// Helper function to capitalize book names properly for display
 function capitalizeBookName(book) {
-  const trimmedBook = book.trim();
+  const normalized = normalizeBookName(book);
   // Split by spaces to handle multi-word books like "1 John" or "Song of Solomon"
-  return trimmedBook
+  return normalized
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
 
@@ -73,20 +82,12 @@ function handleRoute(path) {
     if (match) {
       const [, version, reference] = match;
       
-      // Try to parse "Book Chapter Verse" format (e.g., "John 1 1", "1 John 1 1", "2 Corinthians 3 16")
-      // Regex breakdown:
-      // - (.+?\S) = Non-greedy capture of book name (one or more chars ending with non-whitespace)
-      // - \s+ = One or more whitespace characters separating book from chapter
-      // - (\d+) = Chapter number (one or more digits)
-      // - \s+ = One or more whitespace characters separating chapter from verse
-      // - (\d+) = Verse number (one or more digits)
-      // This handles multi-word books like "1 John" or "Song of Solomon"
-      const refMatch = reference.match(/^(.+?\S)\s+(\d+)\s+(\d+)$/);
+      // Try to parse space-separated Bible reference format using the pattern constant
+      const refMatch = reference.match(BIBLE_REFERENCE_PATTERN);
       
       if (refMatch) {
         const [, book, chapter, verse] = refMatch;
-        // Normalize book name: trim and replace multiple consecutive spaces with single space
-        const normalizedBook = book.trim().replace(/\s+/g, ' ').toLowerCase();
+        const normalizedBook = normalizeBookName(book);
         
         // Redirect to the proper URL format
         const properPath = `/bible/${version.toLowerCase()}/${normalizedBook}/${chapter}/${verse}`;
