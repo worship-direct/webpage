@@ -32,8 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleRoute(path) {
-  // Check if the URL matches our expected pattern
-  const match = path.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
+  // Decode the URL to handle spaces properly
+  const decodedPath = decodeURIComponent(path);
+  
+  // Check if the URL matches the standard pattern: /bible/version/book/chapter/verse
+  let match = decodedPath.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
   
   if (match) {
     const [, version, book, chapter, verse] = match;
@@ -47,6 +50,30 @@ function handleRoute(path) {
     // Fetch and display the verse
     fetchVerse(version, book, chapter, verse);
   } else {
+    // Check for alternative format: /bible/version/Book Chapter Verse (space-separated)
+    match = decodedPath.match(/\/bible\/([^\/]+)\/(.+)/);
+    
+    if (match) {
+      const [, version, reference] = match;
+      
+      // Try to parse "Book Chapter Verse" format (e.g., "John 1 1" or "John 3 16")
+      const refMatch = reference.match(/^([a-zA-Z\s]+?)\s+(\d+)\s+(\d+)$/);
+      
+      if (refMatch) {
+        const [, book, chapter, verse] = refMatch;
+        
+        // Redirect to the proper URL format
+        const properPath = `/bible/${version.toLowerCase()}/${book.trim().toLowerCase()}/${chapter}/${verse}`;
+        history.replaceState(null, '', properPath);
+        
+        // Hide the form and fetch the verse
+        document.getElementById('lookup-form').style.display = 'none';
+        document.title = `${book.trim().charAt(0).toUpperCase() + book.trim().slice(1).toLowerCase()} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
+        fetchVerse(version.toLowerCase(), book.trim().toLowerCase(), chapter, verse);
+        return;
+      }
+    }
+    
     // Show the form for the homepage
     document.getElementById('lookup-form').style.display = 'block';
     document.getElementById('result').innerHTML = '';
