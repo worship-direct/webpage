@@ -201,7 +201,7 @@
         for (let v = firstVerse; v <= lastVerse; v++) {
           const verseText = chapterData[v.toString()];
           if (verseText) {
-            // Remove leading "# " if present (KJV formatting)
+            // Remove leading "# " if present (KJV-specific formatting in source data)
             const cleanText = verseText.startsWith('# ') ? verseText.substring(2) : verseText;
             verses.push({
               book: book,
