@@ -159,11 +159,19 @@ function displayVerse(container, version, book, chapter, verse, text) {
   // Format the book name to be properly capitalized
   const formattedBook = capitalizeBookName(book);
   
+  // Create direct API URL using shared function from api.js if available
+  const apiUrl = (typeof window.generateApiUrl === 'function') 
+    ? window.generateApiUrl(version, formattedBook, chapter, verse)
+    : `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(formattedBook + ' ' + chapter + ' ' + verse)}&format=json`;
+  
   container.innerHTML = `
     <div class="verse-container">
       <div class="verse-display">${text}</div>
       <div class="verse-reference">${formattedBook} ${chapter}:${verse} (${version.toUpperCase()})</div>
       <p><a href="/">Return to verse lookup</a></p>
+      <div style="margin-top: 1rem; font-size: 0.9rem;">
+        <a href="${apiUrl}" target="_blank" rel="noopener noreferrer">Direct API Link</a>
+      </div>
     </div>
   `;
 }

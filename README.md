@@ -9,14 +9,8 @@ Welcome to the **Worship Direct Bible API**. This is a static JSON-based API hos
 ### Nested Format (Recommended)
 | Version | URL | Format |
 |---------|-----|--------|
-| **KJV** | [`https://worship.direct/bible/kjv_nested.json`](https://worship.direct/bible/kjv_nested.json) | Nested |
-| **ASV** | [`https://worship.direct/bible/asv_nested.json`](https://worship.direct/bible/asv_nested.json) | Nested |
-
-### Original Format (Legacy)
-| Version | URL | Format |
-|---------|-----|--------|
-| **KJV** | [`https://worship.direct/bible/kjv.json`](https://worship.direct/bible/kjv.json) | Flat key-value |
-| **ASV** | [`https://worship.direct/bible/asv.json`](https://worship.direct/bible/asv.json) | Complex resultset |
+| **KJV** | [`https://worship.direct/bible/en/kjv.json`](https://worship.direct/bible/en/kjv.json) | Nested |
+| **ASV** | [`https://worship.direct/bible/en/asv.json`](https://worship.direct/bible/en/asv.json) | Nested |
 
 The **nested format** files are structured as nested JSON objects for easy REST API compatibility:
 
@@ -38,7 +32,7 @@ The **nested format** files are structured as nested JSON objects for easy REST 
 
 ```html
 <script>
-  fetch('https://worship.direct/bible/kjv_nested.json')
+  fetch('https://worship.direct/bible/en/kjv.json')
     .then(res => res.json())
     .then(data => {
       const verse = data["John"]["3"]["16"];
@@ -53,7 +47,7 @@ The **nested format** files are structured as nested JSON objects for easy REST 
 import requests
 
 def get_verse(version, book, chapter, verse):
-    url = f"https://worship.direct/bible/{version}_nested.json"
+    url = f"https://worship.direct/bible/en/{version}.json"
     res = requests.get(url)
     if res.status_code != 200:
         return "Error loading Bible JSON"
@@ -71,7 +65,7 @@ const axios = require('axios');
 
 async function getVerse(version, book, chapter, verse) {
   try {
-    const res = await axios.get(`https://worship.direct/bible/${version}_nested.json`);
+    const res = await axios.get(`https://worship.direct/bible/en/${version}.json`);
     const data = res.data;
     const text = data?.[book]?.[chapter]?.[verse];
     console.log(`${book} ${chapter}:${verse} (${version.toUpperCase()}):`, text || "Not found");

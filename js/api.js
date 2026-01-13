@@ -1,7 +1,11 @@
 // Bible verse API handler
 
-// Expose the getVerse function for external use (by the router)
+// Cache for loaded Bible JSON data
+const bibleCache = {};
+
+// Expose functions for external use (by the router)
 window.getVerse = getVerse;
+window.generateApiUrl = generateApiUrl;
 
 document.addEventListener('DOMContentLoaded', () => {
   // Only set up the event listener if we're not already handling a route
@@ -28,76 +32,129 @@ function handleFormSubmission() {
   getVerse(version, book, chapter, verse, displayResult);
 }
 
+// Helper function to normalize book names for case-insensitive matching
+function normalizeBookName(book) {
+  return book.trim().replace(/\s+/g, ' ');
+}
+
+// Helper function to find the correct book name case in the Bible data
+function findBookName(bibleData, bookInput) {
+  const normalizedInput = normalizeBookName(bookInput).toLowerCase();
+  
+  // Try to find a matching book name (case-insensitive)
+  for (const bookName in bibleData) {
+    if (normalizeBookName(bookName).toLowerCase() === normalizedInput) {
+      return bookName;
+    }
+  }
+  
+  return null;
+}
+
+// Load Bible JSON data from local files
+async function loadBibleData(version) {
+  // Check if already cached
+  if (bibleCache[version]) {
+    return bibleCache[version];
+  }
+  
+  // Try to load from bible/en/{version}.json
+  const jsonUrl = `bible/en/${version}.json`;
+  
+  try {
+    const response = await fetch(jsonUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to load ${version} Bible data`);
+    }
+    const data = await response.json();
+    bibleCache[version] = data;
+    return data;
+  } catch (error) {
+    console.error('Error loading Bible data:', error);
+    throw error;
+  }
+}
+
 // Core function to fetch a verse - can be called from router.js or from form submission
 function getVerse(version, book, chapter, verse, callback) {
-  // Bible API endpoint - update this to match your actual API
-  const apiUrl = `https://api.worship.direct/bible/${version}/${book}/${chapter}/${verse}`;
+  console.log(`Fetching verse: ${book} ${chapter}:${verse} (${version})`);
   
-  console.log('Fetching verse from:', apiUrl); // Debug log
-  
-  fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`API returned status: ${response.status}`);
+  // Load the Bible data and extract the verse
+  loadBibleData(version.toLowerCase())
+    .then(bibleData => {
+      // Find the correct book name (case-insensitive)
+      const correctBookName = findBookName(bibleData, book);
+      
+      if (!correctBookName) {
+        throw new Error(`Book "${book}" not found in ${version.toUpperCase()}`);
       }
-      return response.json();
-    })
-    .then(data => {
-      console.log('API response:', data); // Debug log
+      
+      // Access the verse: bibleData[Book][Chapter][Verse]
+      const bookData = bibleData[correctBookName];
+      if (!bookData) {
+        throw new Error(`Book "${book}" not found`);
+      }
+      
+      const chapterData = bookData[String(chapter)];
+      if (!chapterData) {
+        throw new Error(`Chapter ${chapter} not found in ${correctBookName}`);
+      }
+      
+      const verseText = chapterData[String(verse)];
+      if (!verseText) {
+        throw new Error(`Verse ${verse} not found in ${correctBookName} ${chapter}`);
+      }
+      
+      // Create response object
+      const data = {
+        text: verseText,
+        version: version.toLowerCase(),
+        book: correctBookName,
+        chapter: String(chapter),
+        verse: String(verse)
+      };
+      
+      console.log('Verse loaded successfully:', data);
+      
       if (callback && typeof callback === 'function') {
         callback(data);
       }
     })
     .catch(error => {
-      console.error('API fetch error:', error); // Debug log
-      
-      // Try fallback data
-      const fallbackVerse = getFallbackVerse(version, book, chapter, verse);
-      if (fallbackVerse && callback) {
-        console.log('Using fallback data');
-        callback(fallbackVerse);
-      } else {
-        showError(error.message);
-      }
+      console.error('Error fetching verse:', error);
+      showError(error.message);
     });
 }
 
-// Fallback data for common verses during development/testing
-function getFallbackVerse(version, book, chapter, verse) {
-  if (version.toLowerCase() === 'kjv' && 
-      book.toLowerCase() === 'john' && 
-      chapter === '3' && 
-      verse === '16') {
-    return {
-      text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
-      version: "kjv",
-      book: "John",
-      chapter: "3",
-      verse: "16"
-    };
-  }
-  return null;
-}
-
-// Display the API response in the result div
+// Display the result in the result div
 function displayResult(data) {
   const result = document.getElementById('result');
   if (!result) return;
   
   if (data && data.text) {
-    // Format the book name to be properly capitalized
-    const book = data.book || '';
-    const formattedBook = book.charAt(0).toUpperCase() + book.slice(1).toLowerCase();
+    // Use the book name from data (already has correct capitalization from findBookName)
+    const formattedBook = data.book;
+    
+    // Create direct API URL
+    const apiUrl = generateApiUrl(data.version, formattedBook, data.chapter, data.verse);
     
     result.innerHTML = `
       <div class="verse-container">
         <div class="verse-display">${data.text}</div>
         <div class="verse-reference">${formattedBook} ${data.chapter}:${data.verse} (${data.version.toUpperCase()})</div>
+        <div style="margin-top: 1rem; font-size: 0.9rem;">
+          <a href="${apiUrl}" target="_blank" rel="noopener noreferrer">Direct API Link</a>
+        </div>
       </div>
     `;
   } else {
     showError('Invalid response from API');
   }
+}
+
+// Generate API URL for a verse
+function generateApiUrl(version, book, chapter, verse) {
+  return `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(book + ' ' + chapter + ' ' + verse)}&format=json`;
 }
 
 // Error handling
