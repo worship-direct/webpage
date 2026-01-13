@@ -78,6 +78,7 @@
       <li>Verse range (same chapter): <code>kjv.html?ref=Genesis 1:1 - 1:5</code></li>
       <li>Verse range (cross-chapter): <code>kjv.html?ref=Genesis 1:1 - 3:1</code></li>
       <li>Using hash: <code>kjv.html#Genesis 1 1</code></li>
+      <li>JSON API format: <code>kjv.html?ref=John 3 16&format=json</code></li>
     </ul>
   </div>
 
@@ -88,6 +89,12 @@
   <script>
     // Load the KJV Bible JSON data
     let bibleData = null;
+
+    // Check if API mode is requested
+    function isApiMode() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('format') === 'json';
+    }
 
     // Parse URL parameters to get the verse reference
     function parseUrlParameters() {
@@ -225,8 +232,43 @@
       return verses.length > 0 ? verses : { error: 'Verses not found' };
     }
 
+    // Return JSON response for API mode
+    function returnJsonResponse(verses, ref) {
+      if (!verses || verses.error) {
+        const error = { error: verses ? verses.error : 'Invalid reference' };
+        document.body.innerHTML = `<pre>${JSON.stringify(error, null, 2)}</pre>`;
+        return;
+      }
+      
+      // Build reference string
+      let refString;
+      if (ref.isRange) {
+        if (ref.startChapter === ref.endChapter) {
+          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}-${ref.endVerse}`;
+        } else {
+          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse} - ${ref.endChapter}:${ref.endVerse}`;
+        }
+      } else {
+        refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}`;
+      }
+      
+      const response = {
+        reference: refString,
+        version: 'KJV',
+        verses: verses
+      };
+      
+      document.body.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
+    }
+
     // Display verses
     function displayVerses(verses, ref) {
+      // Check if API mode
+      if (isApiMode()) {
+        returnJsonResponse(verses, ref);
+        return;
+      }
+      
       const resultDiv = document.getElementById('result');
       
       if (!verses || verses.error) {
