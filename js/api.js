@@ -7,30 +7,7 @@ const bibleCache = {};
 window.getVerse = getVerse;
 window.generateApiUrl = generateApiUrl;
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Only set up the event listener if we're not already handling a route
-  const fetchButton = document.getElementById('fetch');
-  if (fetchButton && window.location.pathname === '/') {
-    fetchButton.addEventListener('click', handleFormSubmission);
-  }
-});
-
-// Separate the form handling from the API call logic
-function handleFormSubmission() {
-  const version = document.getElementById('version').value;
-  const book = document.getElementById('book').value;
-  const chapter = document.getElementById('chapter').value;
-  const verse = document.getElementById('verse').value;
-
-  // Validate inputs
-  if (!book || !chapter || !verse) {
-    showError('Please fill in all fields');
-    return;
-  }
-
-  // Use the same function that router.js will use
-  getVerse(version, book, chapter, verse, displayResult);
-}
+// Event listener is handled by router.js to avoid duplicate handlers
 
 // Helper function to normalize book names for case-insensitive matching
 function normalizeBookName(book) {
@@ -58,8 +35,8 @@ async function loadBibleData(version) {
     return bibleCache[version];
   }
   
-  // Try to load from bible/en/{version}.json
-  const jsonUrl = `bible/en/${version}.json`;
+  // Try to load from bible/en/{version}.json (use absolute path from root)
+  const jsonUrl = `/bible/en/${version}.json`;
   
   try {
     const response = await fetch(jsonUrl);
