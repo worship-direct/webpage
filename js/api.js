@@ -3,8 +3,9 @@
 // Cache for loaded Bible JSON data
 const bibleCache = {};
 
-// Expose the getVerse function for external use (by the router)
+// Expose functions for external use (by the router)
 window.getVerse = getVerse;
+window.generateApiUrl = generateApiUrl;
 
 document.addEventListener('DOMContentLoaded', () => {
   // Only set up the event listener if we're not already handling a route
@@ -131,11 +132,11 @@ function displayResult(data) {
   if (!result) return;
   
   if (data && data.text) {
-    // Use the book name from data (which has correct capitalization)
+    // Use the book name from data (already has correct capitalization from findBookName)
     const formattedBook = data.book;
     
     // Create direct API URL
-    const apiUrl = `${window.location.origin}/bible/en/${data.version}.html?ref=${encodeURIComponent(formattedBook + ' ' + data.chapter + ' ' + data.verse)}&format=json`;
+    const apiUrl = generateApiUrl(data.version, formattedBook, data.chapter, data.verse);
     
     result.innerHTML = `
       <div class="verse-container">
@@ -149,6 +150,11 @@ function displayResult(data) {
   } else {
     showError('Invalid response from API');
   }
+}
+
+// Generate API URL for a verse
+function generateApiUrl(version, book, chapter, verse) {
+  return `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(book + ' ' + chapter + ' ' + verse)}&format=json`;
 }
 
 // Error handling
