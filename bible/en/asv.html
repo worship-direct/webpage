@@ -93,7 +93,8 @@
     // Check if API mode is requested
     function isApiMode() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('format') === 'json';
+      const format = params.get('format');
+      return format === 'json' || format === 'txt';
     }
 
     // Parse URL parameters to get the verse reference
@@ -259,11 +260,29 @@
       document.body.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
     }
 
+    // Return plain text response for txt format
+    function returnTxtResponse(verses) {
+      if (!verses || verses.error) {
+        document.body.innerHTML = `<pre>${verses ? verses.error : 'Invalid reference'}</pre>`;
+        return;
+      }
+      
+      // Output only the text field of each verse
+      const textOnly = verses.map(v => v.text).join(' ');
+      document.body.innerHTML = `<pre>${textOnly}</pre>`;
+    }
+
     // Display verses
     function displayVerses(verses, ref) {
       // Check if API mode
       if (isApiMode()) {
-        returnJsonResponse(verses, ref);
+        const params = new URLSearchParams(window.location.search);
+        const format = params.get('format');
+        if (format === 'txt') {
+          returnTxtResponse(verses);
+        } else {
+          returnJsonResponse(verses, ref);
+        }
         return;
       }
       
