@@ -25,6 +25,20 @@
       border-radius: 8px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+    /* Widget mode styling - only show the result container */
+    body.widget-mode {
+      padding: 0;
+      background: transparent;
+      max-width: none;
+      margin: 0;
+    }
+    body.widget-mode h1,
+    body.widget-mode .instructions {
+      display: none;
+    }
+    body.widget-mode #result {
+      margin-top: 0;
+    }
     .verse { 
       font-size: 1.2rem; 
       line-height: 1.8;
@@ -75,6 +89,7 @@
     <strong>How to use:</strong>
     <ul>
       <li>Web interface: <code>kjv.html?ref=Genesis 1 1&format=web</code></li>
+      <li>Widget format (for embedding): <code>kjv.html?ref=Genesis 1 1&format=widget</code></li>
       <li>Plain text (default): <code>kjv.html?ref=Genesis 1 1</code></li>
       <li>JSON API format: <code>kjv.html?ref=John 3 16&format=json</code></li>
       <li>Verse range (same chapter): <code>kjv.html?ref=Genesis 1:1 - 1:5&format=web</code></li>
@@ -96,12 +111,18 @@
       const params = new URLSearchParams(window.location.search);
       const format = params.get('format');
       // Default format is now 'txt' when no format parameter is provided
-      // 'web' format shows the HTML interface
+      // 'web' and 'widget' formats show the HTML interface
       // 'json' and 'txt' are API modes
       if (format === null) {
         return true; // No format parameter means txt format (API mode)
       }
       return format === 'json' || format === 'txt';
+    }
+
+    // Check if widget mode is requested
+    function isWidgetMode() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('format') === 'widget';
     }
 
     // Parse URL parameters to get the verse reference
@@ -331,6 +352,11 @@
 
     // Main execution
     async function init() {
+      // Apply widget mode styling if needed
+      if (isWidgetMode()) {
+        document.body.classList.add('widget-mode');
+      }
+
       const resultDiv = document.getElementById('result');
       
       try {
