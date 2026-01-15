@@ -54,7 +54,7 @@ The **HTML endpoints** provide both an interactive web interface and a JSON API 
 
 #### URL Formats Supported:
 - **Single verse (query parameter)**: `kjv.html?ref=Genesis 1 1&format=web` (space-separated)
-- **Single verse (hash fragment)**: `kjv.html#Genesis 1 1&format=web`
+- **Single verse (hash fragment)**: `kjv.html?format=web#Genesis 1 1` (note: format must be in query string)
 - **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5&format=web` (colon notation for ranges)
 - **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1&format=web`
 
