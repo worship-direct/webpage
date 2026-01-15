@@ -190,11 +190,30 @@ See [`scripts/README.md`](scripts/README.md) for detailed documentation.
 
 ---
 
+## 🤖 Automated Workflows
+
+### Screenshot Updates
+The repository includes a GitHub Actions workflow that automatically updates screenshots when UI files are modified. The workflow:
+
+- Triggers on pushes to `main` branch when `index.html`, Bible HTML files, JavaScript files, or `icon.html` change
+- Can also be manually triggered via workflow_dispatch
+- Uses Playwright to capture screenshots of:
+  - Main landing page
+  - Verse lookup results
+  - KJV and ASV HTML interfaces
+  - JSON API response format
+- Automatically commits and pushes updated screenshots
+
+See [`.github/workflows/update-screenshots.yml`](.github/workflows/update-screenshots.yml) for details.
+
+---
+
 ## 🧰 File Structure
 
 ```
 /worship.direct/
 ├── index.html
+├── icon.html             # Reusable SVG logo
 ├── js/
 │   └── api.js
 ├── bible/
@@ -203,12 +222,22 @@ See [`scripts/README.md`](scripts/README.md) for detailed documentation.
 │       ├── asv.json          # ASV Bible data (nested format)
 │       ├── kjv.html          # KJV HTML API & interactive interface
 │       └── asv.html          # ASV HTML API & interactive interface
+├── screenshots/          # UI screenshots for documentation
+│   ├── main-page.png
+│   ├── verse-lookup-result.png
+│   ├── kjv-html-interface.png
+│   ├── asv-html-interface.png
+│   └── json-api-response.png
 ├── scripts/              # Conversion scripts
 │   ├── README.md
 │   ├── convert_kjv_to_nested.py
 │   ├── convert_asv_to_nested.py
 │   ├── convert_kjv_to_nested.js
 │   └── convert_asv_to_nested.js
+├── .github/
+│   └── workflows/
+│       ├── update-version.yml
+│       └── update-screenshots.yml
 └── README.md ← (this file)
 ```
 
