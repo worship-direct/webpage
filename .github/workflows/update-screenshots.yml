@@ -86,7 +86,7 @@ jobs:
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/asv-html-interface.png' });
 
-              // Plain text format (format=txt) - single verse
+              // Plain text format (format=txt)
               console.log('Taking plain text format screenshot (format=txt)...');
               await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=txt');
               await page.waitForTimeout(3000);

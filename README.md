@@ -104,7 +104,7 @@ https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:3
 https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt
 ```
 
-![Plain Text API Response](screenshots/txt-format-response.png)
+![Plain text format API response showing John 3:16](screenshots/txt-format-response.png)
 
 **Web Interface Example:**
 
