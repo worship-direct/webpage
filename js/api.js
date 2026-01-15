@@ -112,7 +112,7 @@ function displayResult(data) {
     // Use the book name from data (already has correct capitalization from findBookName)
     const formattedBook = data.book;
     
-    // Create direct web interface URL
+    // Create URL for verse lookup in the web interface
     const apiUrl = generateApiUrl(data.version, formattedBook, data.chapter, data.verse);
     
     result.innerHTML = `
@@ -129,7 +129,8 @@ function displayResult(data) {
   }
 }
 
-// Generate web interface URL for a verse
+// Generate URL for verse lookup in the web interface
+// Note: Function name is 'generateApiUrl' for backward compatibility
 function generateApiUrl(version, book, chapter, verse) {
   return `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(book + ' ' + chapter + ' ' + verse)}&format=web`;
 }
