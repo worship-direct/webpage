@@ -1,0 +1,132 @@
+name: Update Screenshots
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'bible/en/*.html'
+      - 'js/*.js'
+      - 'icon.html'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev playwright
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8080 &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          sleep 3
+
+      - name: Create screenshots directory
+        run: mkdir -p screenshots
+
+      - name: Take screenshots
+        run: |
+          cat > take-screenshots.js << 'EOF'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch();
+            const context = await browser.newContext({
+              viewport: { width: 1280, height: 720 }
+            });
+            const page = await context.newPage();
+
+            try {
+              // Main page screenshot
+              console.log('Taking main page screenshot...');
+              await page.goto('http://localhost:8080/');
+              await page.waitForTimeout(2000);
+              await page.screenshot({ path: 'screenshots/main-page.png' });
+
+              // Fill form and get verse lookup result
+              console.log('Taking verse lookup result screenshot...');
+              await page.fill('input#book', 'John');
+              await page.fill('input#chapter', '3');
+              await page.fill('input#verse', '16');
+              await page.click('button#fetch');
+              await page.waitForTimeout(2000);
+              await page.screenshot({ path: 'screenshots/verse-lookup-result.png' });
+
+              // KJV HTML interface
+              console.log('Taking KJV HTML interface screenshot...');
+              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/kjv-html-interface.png' });
+
+              // ASV HTML interface
+              console.log('Taking ASV HTML interface screenshot...');
+              await page.goto('http://localhost:8080/bible/en/asv.html?ref=Psalms%2023%201');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/asv-html-interface.png' });
+
+              // JSON API response
+              console.log('Taking JSON API response screenshot...');
+              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=json');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/json-api-response.png' });
+
+              console.log('All screenshots taken successfully!');
+            } catch (error) {
+              console.error('Error taking screenshots:', error);
+              process.exit(1);
+            } finally {
+              await browser.close();
+            }
+          })();
+          EOF
+
+          node take-screenshots.js
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -n "$SERVER_PID" ]; then
+            kill $SERVER_PID || true
+          fi
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git add screenshots/*.png
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No screenshot changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Screenshot changes detected"
+          fi
+
+      - name: Commit and push screenshots
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Update screenshots [skip ci]"
+          git push
