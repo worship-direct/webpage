@@ -74,20 +74,26 @@ jobs:
               await page.waitForTimeout(2000);
               await page.screenshot({ path: 'screenshots/verse-lookup-result.png' });
 
-              // KJV HTML interface
-              console.log('Taking KJV HTML interface screenshot...');
-              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016');
+              // KJV HTML interface (format=web)
+              console.log('Taking KJV HTML interface screenshot (format=web)...');
+              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=web');
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/kjv-html-interface.png' });
 
-              // ASV HTML interface
-              console.log('Taking ASV HTML interface screenshot...');
-              await page.goto('http://localhost:8080/bible/en/asv.html?ref=Psalms%2023%201');
+              // ASV HTML interface (format=web)
+              console.log('Taking ASV HTML interface screenshot (format=web)...');
+              await page.goto('http://localhost:8080/bible/en/asv.html?ref=Psalms%2023%201&format=web');
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/asv-html-interface.png' });
 
-              // JSON API response
-              console.log('Taking JSON API response screenshot...');
+              // Plain text format (format=txt) - single verse
+              console.log('Taking plain text format screenshot (format=txt)...');
+              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=txt');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/txt-format-response.png' });
+
+              // JSON API response (format=json)
+              console.log('Taking JSON API response screenshot (format=json)...');
               await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=json');
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/json-api-response.png' });
