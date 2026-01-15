@@ -63,6 +63,7 @@ The HTML endpoints support multiple output formats via the `format` parameter:
 
 - **Plain Text Mode (default)**: No format parameter needed - returns raw verse text only
 - **Web Interface**: Add `&format=web` to display verses in a formatted HTML interface
+- **Widget Mode**: Add `&format=widget` to display only the verse container (for embedding in other websites/resources)
 - **JSON API Mode**: Add `&format=json` to get structured JSON responses
 
 ![JSON API Response](screenshots/json-api-response.png)
@@ -112,6 +113,21 @@ https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=web
 
 # Verse range - displays in formatted HTML interface
 https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=web
+```
+
+**Widget Format Example:**
+
+```bash
+# Single verse - displays only the verse container (no header/instructions)
+# Perfect for embedding in iframes or other websites
+https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=widget
+
+# Verse range - widget format
+https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=widget
+
+# HTML embedding example:
+<iframe src="https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=widget" 
+        width="100%" height="200" frameborder="0"></iframe>
 ```
 
 ---
