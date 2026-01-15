@@ -14,17 +14,32 @@
   <!-- 3D Bible icon at 45 degrees -->
   <g transform="translate(40, 20)">
     <!-- Bible in isometric view (45 degrees) -->
+    
     <!-- Front cover (thick line) -->
     <path d="M 0 20 L 20 10 L 20 40 L 0 50 Z" fill="none" stroke="#666" stroke-width="2"/>
     
     <!-- Top edge showing pages (thin lines) -->
     <path d="M 0 20 L 20 10 L 35 15 L 15 25 Z" fill="#fff" stroke="#666" stroke-width="0.5"/>
     
-    <!-- Right side/back cover (thick line) -->
-    <path d="M 20 10 L 35 15 L 35 45 L 20 40 Z" fill="none" stroke="#666" stroke-width="2"/>
+    <!-- Back cover (thick lines) -->
+    <!-- Top edge of back cover -->
+    <line x1="20" y1="10" x2="35" y2="15" stroke="#666" stroke-width="2"/>
+    <!-- Right edge of back cover -->
+    <line x1="35" y1="15" x2="35" y2="45" stroke="#666" stroke-width="2"/>
+    <!-- Bottom edge of back cover -->
+    <line x1="35" y1="45" x2="20" y2="40" stroke="#666" stroke-width="2"/>
+    <!-- Left edge of back cover -->
+    <line x1="20" y1="40" x2="20" y2="10" stroke="#666" stroke-width="2"/>
     
-    <!-- Spine (thick line) -->
-    <path d="M 0 20 L 15 25 L 15 55 L 0 50 Z" fill="none" stroke="#666" stroke-width="2"/>
+    <!-- Spine (thick lines) -->
+    <!-- Top edge of spine -->
+    <line x1="0" y1="20" x2="15" y2="25" stroke="#666" stroke-width="2"/>
+    <!-- Right edge of spine -->
+    <line x1="15" y1="25" x2="15" y2="55" stroke="#666" stroke-width="2"/>
+    <!-- Bottom edge of spine -->
+    <line x1="15" y1="55" x2="0" y2="50" stroke="#666" stroke-width="2"/>
+    <!-- Left edge of spine -->
+    <line x1="0" y1="50" x2="0" y2="20" stroke="#666" stroke-width="2"/>
     
     <!-- Page lines (thin lines for depth) - only visible on top edge -->
     <line x1="20" y1="12" x2="33" y2="16" stroke="#666" stroke-width="0.5"/>
