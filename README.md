@@ -35,9 +35,9 @@ The **nested format** files are structured as nested JSON objects for easy REST 
 The **HTML endpoints** provide both an interactive web interface and a JSON API mode for verse lookups.
 
 #### URL Formats Supported:
-- **Query parameter**: `kjv.html?ref=Genesis 1 1`
-- **Hash fragment**: `kjv.html#Genesis 1 1`
-- **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5`
+- **Single verse (query parameter)**: `kjv.html?ref=Genesis 1 1` (space-separated)
+- **Single verse (hash fragment)**: `kjv.html#Genesis 1 1`
+- **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5` (colon notation for ranges)
 - **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1`
 
 #### JSON API Mode:
