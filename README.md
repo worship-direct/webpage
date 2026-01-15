@@ -26,6 +26,44 @@ The **nested format** files are structured as nested JSON objects for easy REST 
 
 ---
 
+### HTML API Endpoints (Interactive & JSON API)
+| Version | URL | Description |
+|---------|-----|-------------|
+| **KJV** | [`https://worship.direct/bible/en/kjv.html`](https://worship.direct/bible/en/kjv.html) | HTML interface with JSON API support |
+| **ASV** | [`https://worship.direct/bible/en/asv.html`](https://worship.direct/bible/en/asv.html) | HTML interface with JSON API support |
+
+The **HTML endpoints** provide both an interactive web interface and a JSON API mode for verse lookups.
+
+#### URL Formats Supported:
+- **Query parameter**: `kjv.html?ref=Genesis 1 1`
+- **Hash fragment**: `kjv.html#Genesis 1 1`
+- **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5`
+- **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1`
+
+#### JSON API Mode:
+Add `&format=json` to get structured JSON responses:
+
+```bash
+# Single verse
+https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json
+
+# Response format:
+{
+  "reference": "John 3:16",
+  "version": "KJV",
+  "verses": [
+    {
+      "book": "John",
+      "chapter": 3,
+      "verse": 16,
+      "text": "For God so loved the world..."
+    }
+  ]
+}
+```
+
+---
+
 ## ✅ How to Use the API
 
 ### 📄 HTML/JavaScript Example (Nested Format)
@@ -77,6 +115,36 @@ async function getVerse(version, book, chapter, verse) {
 getVerse("kjv", "John", "3", "16");
 ```
 
+### 🌐 HTML API Examples
+
+#### Using Query Parameters (JSON API Mode)
+
+```bash
+# Fetch a single verse as JSON
+curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json"
+
+# Fetch a verse range as JSON
+curl "https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=json"
+```
+
+#### JavaScript Fetch Example (HTML API)
+
+```javascript
+// Fetch verse from HTML API in JSON mode
+fetch('https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json')
+  .then(res => res.json())
+  .then(data => {
+    console.log(data.reference); // "John 3:16"
+    console.log(data.verses[0].text); // The verse text
+  });
+```
+
+#### Interactive Web Interface
+
+Simply navigate to the HTML endpoint in a browser with a verse reference:
+- `https://worship.direct/bible/en/kjv.html?ref=John 3 16`
+- `https://worship.direct/bible/en/asv.html#Psalm 23 1`
+
 ---
 
 ## 🛠️ Reformatting Scripts
@@ -110,10 +178,11 @@ See [`scripts/README.md`](scripts/README.md) for detailed documentation.
 ├── js/
 │   └── api.js
 ├── bible/
-│   ├── kjv.json          # Original flat format
-│   ├── asv.json          # Original resultset format
-│   ├── kjv_nested.json   # Nested format (recommended)
-│   └── asv_nested.json   # Nested format (recommended)
+│   └── en/
+│       ├── kjv.json          # KJV Bible data (nested format)
+│       ├── asv.json          # ASV Bible data (nested format)
+│       ├── kjv.html          # KJV HTML API & interactive interface
+│       └── asv.html          # ASV HTML API & interactive interface
 ├── scripts/              # Conversion scripts
 │   ├── README.md
 │   ├── convert_kjv_to_nested.py
