@@ -58,10 +58,16 @@ The **HTML endpoints** provide both an interactive web interface and a JSON API 
 - **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5` (colon notation for ranges)
 - **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1`
 
-#### JSON API Mode:
-Add `&format=json` to get structured JSON responses:
+#### Output Format Options:
+The HTML endpoints support multiple output formats via the `format` parameter:
+
+- **Web Interface (default)**: No format parameter needed - displays verses in a formatted HTML interface
+- **JSON API Mode**: Add `&format=json` to get structured JSON responses
+- **Plain Text Mode**: Add `&format=txt` to get raw verse text only
 
 ![JSON API Response](screenshots/json-api-response.png)
+
+**JSON Format Example:**
 
 ```bash
 # Single verse
@@ -80,6 +86,19 @@ https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json
     }
   ]
 }
+```
+
+**Plain Text Format Example:**
+
+```bash
+# Single verse - returns only the verse text
+https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt
+
+# Response (plain text):
+For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.
+
+# Verse range - returns concatenated verse text
+https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:3&format=txt
 ```
 
 ---
@@ -137,7 +156,7 @@ getVerse("kjv", "John", "3", "16");
 
 ### 🌐 HTML API Examples
 
-#### Using Query Parameters (JSON API Mode)
+#### Using Query Parameters
 
 ```bash
 # Fetch a single verse as JSON
@@ -145,6 +164,9 @@ curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json"
 
 # Fetch a verse range as JSON
 curl "https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=json"
+
+# Fetch verse text only (plain text format)
+curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt"
 ```
 
 #### JavaScript Fetch Example (HTML API)
