@@ -2,6 +2,18 @@
 
 Welcome to the **Worship Direct Bible API**. This is a static JSON-based API hosted via GitHub Pages. It provides full access to the **King James Version (KJV)** and **American Standard Version (ASV)** of the Bible.
 
+## 📸 Screenshots
+
+### Main Landing Page
+The main page provides an interactive verse lookup interface:
+
+![Main Page](screenshots/main-page.png)
+
+### Verse Lookup Result
+Example of looking up John 3:16 (KJV):
+
+![Verse Lookup Result](screenshots/verse-lookup-result.png)
+
 ---
 
 ## 🌐 API Endpoints
@@ -34,6 +46,12 @@ The **nested format** files are structured as nested JSON objects for easy REST 
 
 The **HTML endpoints** provide both an interactive web interface and a JSON API mode for verse lookups.
 
+#### KJV HTML Interface
+![KJV HTML Interface](screenshots/kjv-html-interface.png)
+
+#### ASV HTML Interface
+![ASV HTML Interface](screenshots/asv-html-interface.png)
+
 #### URL Formats Supported:
 - **Single verse (query parameter)**: `kjv.html?ref=Genesis 1 1` (space-separated)
 - **Single verse (hash fragment)**: `kjv.html#Genesis 1 1`
@@ -42,6 +60,8 @@ The **HTML endpoints** provide both an interactive web interface and a JSON API 
 
 #### JSON API Mode:
 Add `&format=json` to get structured JSON responses:
+
+![JSON API Response](screenshots/json-api-response.png)
 
 ```bash
 # Single verse
