@@ -53,17 +53,17 @@ The **HTML endpoints** provide both an interactive web interface and a JSON API 
 ![ASV HTML Interface](screenshots/asv-html-interface.png)
 
 #### URL Formats Supported:
-- **Single verse (query parameter)**: `kjv.html?ref=Genesis 1 1` (space-separated)
-- **Single verse (hash fragment)**: `kjv.html#Genesis 1 1`
-- **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5` (colon notation for ranges)
-- **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1`
+- **Single verse (query parameter)**: `kjv.html?ref=Genesis 1 1&format=web` (space-separated)
+- **Single verse (hash fragment)**: `kjv.html#Genesis 1 1&format=web`
+- **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5&format=web` (colon notation for ranges)
+- **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1&format=web`
 
 #### Output Format Options:
 The HTML endpoints support multiple output formats via the `format` parameter:
 
-- **Web Interface (default)**: No format parameter needed - displays verses in a formatted HTML interface
+- **Plain Text Mode (default)**: No format parameter needed - returns raw verse text only
+- **Web Interface**: Add `&format=web` to display verses in a formatted HTML interface
 - **JSON API Mode**: Add `&format=json` to get structured JSON responses
-- **Plain Text Mode**: Add `&format=txt` to get raw verse text only
 
 ![JSON API Response](screenshots/json-api-response.png)
 
@@ -91,14 +91,27 @@ https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json
 **Plain Text Format Example:**
 
 ```bash
-# Single verse - returns only the verse text
-https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt
+# Single verse - returns only the verse text (default)
+https://worship.direct/bible/en/kjv.html?ref=John 3 16
 
 # Response (plain text):
 For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.
 
-# Verse range - returns concatenated verse text
-https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:3&format=txt
+# Verse range - returns concatenated verse text (default)
+https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:3
+
+# Explicit format=txt also works
+https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt
+```
+
+**Web Interface Example:**
+
+```bash
+# Single verse - displays in formatted HTML interface
+https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=web
+
+# Verse range - displays in formatted HTML interface
+https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=web
 ```
 
 ---
@@ -165,8 +178,8 @@ curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json"
 # Fetch a verse range as JSON
 curl "https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=json"
 
-# Fetch verse text only (plain text format)
-curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt"
+# Fetch verse text only (plain text format - default)
+curl "https://worship.direct/bible/en/kjv.html?ref=John 3 16"
 ```
 
 #### JavaScript Fetch Example (HTML API)
@@ -183,9 +196,9 @@ fetch('https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=json')
 
 #### Interactive Web Interface
 
-Simply navigate to the HTML endpoint in a browser with a verse reference:
-- `https://worship.direct/bible/en/kjv.html?ref=John 3 16`
-- `https://worship.direct/bible/en/asv.html#Psalm 23 1`
+Simply navigate to the HTML endpoint in a browser with a verse reference and format=web:
+- `https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=web`
+- `https://worship.direct/bible/en/asv.html?ref=Psalm 23 1&format=web`
 
 ---
 

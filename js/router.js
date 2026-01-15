@@ -162,7 +162,7 @@ function displayVerse(container, version, book, chapter, verse, text) {
   // Create direct API URL using shared function from api.js if available
   const apiUrl = (typeof window.generateApiUrl === 'function') 
     ? window.generateApiUrl(version, formattedBook, chapter, verse)
-    : `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(formattedBook + ' ' + chapter + ' ' + verse)}&format=json`;
+    : `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(formattedBook + ' ' + chapter + ' ' + verse)}&format=web`;
   
   container.innerHTML = `
     <div class="verse-container">

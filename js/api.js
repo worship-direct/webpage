@@ -131,7 +131,7 @@ function displayResult(data) {
 
 // Generate API URL for a verse
 function generateApiUrl(version, book, chapter, verse) {
-  return `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(book + ' ' + chapter + ' ' + verse)}&format=json`;
+  return `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(book + ' ' + chapter + ' ' + verse)}&format=web`;
 }
 
 // Error handling

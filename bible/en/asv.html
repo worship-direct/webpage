@@ -74,12 +74,12 @@
   <div class="instructions">
     <strong>How to use:</strong>
     <ul>
-      <li>Single verse: <code>asv.html?ref=Genesis 1 1</code></li>
-      <li>Verse range (same chapter): <code>asv.html?ref=Genesis 1:1 - 1:5</code></li>
-      <li>Verse range (cross-chapter): <code>asv.html?ref=Genesis 1:1 - 3:1</code></li>
-      <li>Using hash: <code>asv.html#Genesis 1 1</code></li>
+      <li>Web interface: <code>asv.html?ref=Genesis 1 1&format=web</code></li>
+      <li>Plain text (default): <code>asv.html?ref=Genesis 1 1</code></li>
       <li>JSON API format: <code>asv.html?ref=John 3 16&format=json</code></li>
-      <li>Plain text format: <code>asv.html?ref=John 3 16&format=txt</code></li>
+      <li>Verse range (same chapter): <code>asv.html?ref=Genesis 1:1 - 1:5&format=web</code></li>
+      <li>Verse range (cross-chapter): <code>asv.html?ref=Genesis 1:1 - 3:1&format=web</code></li>
+      <li>Using hash: <code>asv.html#Genesis 1 1&format=web</code></li>
     </ul>
   </div>
 
@@ -95,6 +95,12 @@
     function isApiMode() {
       const params = new URLSearchParams(window.location.search);
       const format = params.get('format');
+      // Default format is now 'txt' when no format parameter is provided
+      // 'web' format shows the HTML interface
+      // 'json' and 'txt' are API modes
+      if (format === null) {
+        return true; // No format parameter means txt format (API mode)
+      }
       return format === 'json' || format === 'txt';
     }
 
@@ -279,10 +285,12 @@
       if (isApiMode()) {
         const params = new URLSearchParams(window.location.search);
         const format = params.get('format');
-        if (format === 'txt') {
-          returnTxtResponse(verses);
-        } else {
+        // Default is txt when no format parameter is provided
+        if (format === 'json') {
           returnJsonResponse(verses, ref);
+        } else {
+          // Both format=txt and no format parameter return txt
+          returnTxtResponse(verses);
         }
         return;
       }
