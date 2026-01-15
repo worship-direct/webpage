@@ -105,6 +105,8 @@ https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:3
 https://worship.direct/bible/en/kjv.html?ref=John 3 16&format=txt
 ```
 
+![Plain text format API response showing John 3:16](screenshots/txt-format-response.png)
+
 **Web Interface Example:**
 
 ```bash
@@ -251,8 +253,9 @@ The repository includes a GitHub Actions workflow that automatically updates scr
 - Uses Playwright to capture screenshots of:
   - Main landing page
   - Verse lookup results
-  - KJV and ASV HTML interfaces
-  - JSON API response format
+  - KJV and ASV HTML interfaces (format=web)
+  - Plain text API response (format=txt)
+  - JSON API response (format=json)
 - Automatically commits and pushes updated screenshots
 
 See [`.github/workflows/update-screenshots.yml`](.github/workflows/update-screenshots.yml) for details.
@@ -278,6 +281,7 @@ See [`.github/workflows/update-screenshots.yml`](.github/workflows/update-screen
 │   ├── verse-lookup-result.png
 │   ├── kjv-html-interface.png
 │   ├── asv-html-interface.png
+│   ├── txt-format-response.png
 │   └── json-api-response.png
 ├── scripts/              # Conversion scripts
 │   ├── README.md
