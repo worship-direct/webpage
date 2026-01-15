@@ -132,6 +132,12 @@ https://worship.direct/bible/en/asv.html?ref=Genesis 1:1 - 1:5&format=widget
         width="100%" height="200" frameborder="0"></iframe>
 ```
 
+#### KJV Widget Format
+![KJV Widget Format](screenshots/kjv-widget-format.png)
+
+#### ASV Widget Format
+![ASV Widget Format](screenshots/asv-widget-format.png)
+
 ---
 
 ## ✅ How to Use the API
@@ -256,6 +262,7 @@ The repository includes a GitHub Actions workflow that automatically updates scr
   - KJV and ASV HTML interfaces (format=web)
   - Plain text API response (format=txt)
   - JSON API response (format=json)
+  - KJV and ASV widget formats (format=widget)
 - Automatically commits and pushes updated screenshots
 
 See [`.github/workflows/update-screenshots.yml`](.github/workflows/update-screenshots.yml) for details.
@@ -282,7 +289,9 @@ See [`.github/workflows/update-screenshots.yml`](.github/workflows/update-screen
 │   ├── kjv-html-interface.png
 │   ├── asv-html-interface.png
 │   ├── txt-format-response.png
-│   └── json-api-response.png
+│   ├── json-api-response.png
+│   ├── kjv-widget-format.png
+│   └── asv-widget-format.png
 ├── scripts/              # Conversion scripts
 │   ├── README.md
 │   ├── convert_kjv_to_nested.py

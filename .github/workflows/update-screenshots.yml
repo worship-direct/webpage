@@ -98,6 +98,18 @@ jobs:
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/json-api-response.png' });
 
+              // KJV Widget format (format=widget)
+              console.log('Taking KJV widget format screenshot (format=widget)...');
+              await page.goto('http://localhost:8080/bible/en/kjv.html?ref=John%203%2016&format=widget');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/kjv-widget-format.png' });
+
+              // ASV Widget format (format=widget)
+              console.log('Taking ASV widget format screenshot (format=widget)...');
+              await page.goto('http://localhost:8080/bible/en/asv.html?ref=Psalms%2023%201&format=widget');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/asv-widget-format.png' });
+
               console.log('All screenshots taken successfully!');
             } catch (error) {
               console.error('Error taking screenshots:', error);
