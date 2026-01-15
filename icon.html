@@ -11,10 +11,32 @@
     providing tools to spread the word of God
   </text>
   
-  <!-- Decorative book icon -->
-  <g transform="translate(40, 30)">
-    <path d="M 7 0 L 10 0 L 18 4 L 18 28 L 7 24 L 10 24 L 0 28 Z" fill="none" stroke="#666" stroke-width="1"/>
-    <line x1="10" y1="0" x2="10" y2="24" stroke="#666" stroke-width="1"/>
-    <line x1="7" y1="0" x2="7" y2="24" stroke="#666" stroke-width="1"/>
+  <!-- 3D Bible icon at 45 degrees -->
+  <g transform="translate(40, 20)">
+    <!-- Bible in isometric view (45 degrees) -->
+    <!-- Front cover (thick line) -->
+    <path d="M 0 20 L 20 10 L 20 40 L 0 50 Z" fill="none" stroke="#666" stroke-width="2"/>
+    
+    <!-- Top edge showing pages (thin lines) -->
+    <path d="M 0 20 L 20 10 L 35 15 L 15 25 Z" fill="none" stroke="#666" stroke-width="0.5"/>
+    
+    <!-- Right side/back cover (thick line) -->
+    <path d="M 20 10 L 35 15 L 35 45 L 20 40 Z" fill="none" stroke="#666" stroke-width="2"/>
+    
+    <!-- Spine (thick line) -->
+    <path d="M 0 20 L 15 25 L 15 55 L 0 50 Z" fill="none" stroke="#666" stroke-width="2"/>
+    
+    <!-- Page lines (thin lines for depth) -->
+    <line x1="2" y1="22" x2="18" y2="12" stroke="#666" stroke-width="0.5"/>
+    <line x1="4" y1="24" x2="18" y2="14" stroke="#666" stroke-width="0.5"/>
+    <line x1="6" y1="26" x2="18" y2="16" stroke="#666" stroke-width="0.5"/>
+    
+    <!-- Cross on the front cover -->
+    <g transform="translate(8, 32)">
+      <!-- Vertical part of cross -->
+      <line x1="0" y1="-6" x2="0" y2="6" stroke="#666" stroke-width="1.5"/>
+      <!-- Horizontal part of cross -->
+      <line x1="-3" y1="-1" x2="3" y2="-1" stroke="#666" stroke-width="1.5"/>
+    </g>
   </g>
 </svg>
