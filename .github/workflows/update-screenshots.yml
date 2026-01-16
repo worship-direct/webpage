@@ -1,10 +1,14 @@
 name: Update Screenshots
 
 on:
-  workflow_run:
-    workflows: ["pages-build-deployment"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'bible/**/*.html'
+      - 'js/**/*.js'
+      - 'icon.html'
   workflow_dispatch: # Allow manual trigger
 
 permissions:
@@ -13,7 +17,6 @@ permissions:
 jobs:
   update-screenshots:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
