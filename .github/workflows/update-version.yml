@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'screenshots/**'
 
 permissions:
   contents: write
