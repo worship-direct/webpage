@@ -1,0 +1,31 @@
+<svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="worship.direct - providing tools to spread the word of God">
+  <title>worship.direct - providing tools to spread the word of God</title>
+  
+  <!-- 3D Bible icon at 45 degrees -->
+  <g transform="translate(40, 20)">
+    <!-- Back cover (thick lines) -->
+    <!-- Top edge of back cover -->
+    <line x1="20" y1="10" x2="35" y2="15" stroke="#666" stroke-width="2"/>
+    <!-- Right edge of back cover -->
+    <line x1="35" y1="15" x2="35" y2="45" stroke="#666" stroke-width="2"/>
+    <!-- Bottom edge of back cover which needs adjusted-->
+    <line x1="35" y1="45" x2="20" y2="40" stroke="#666" stroke-width="2"/>
+    <!-- Left edge of back cover -->
+    <!-- <line x1="20" y1="40" x2="20" y2="10" stroke="#666" stroke-width="2"/> -->
+    
+    <!-- Front Cover -->
+  
+    <line x1="3.75" y1="20" x2="18.75" y2="25" stroke="#666" stroke-width="2"/>
+
+    <line x1="18.75" y1="25" x2="18.75" y2="55" stroke="#666" stroke-width="2"/>
+    <!-- Bottom edge of front cover-->
+    <line x1="18.75" y1="55" x2="3.75" y2="50" stroke="#666" stroke-width="2"/>
+
+    <g transform="translate(11.75, 32)">
+      <!-- Vertical part of cross -->
+      <line x1="0" y1="-6" x2="0" y2="6" stroke="#666" stroke-width="1.5"/>
+      <!-- Horizontal part of cross -->
+      <line x1="-3" y1="-1" x2="3" y2="-1" stroke="#666" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>
