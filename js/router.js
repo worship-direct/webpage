@@ -174,4 +174,170 @@ function displayVerse(container, version, book, chapter, verse, text) {
       </div>
     </div>
   `;
+
+  // Attach recording controls if recorder/player modules are loaded
+  if (typeof window.WDRecorder === 'object' && typeof window.WDPlayer === 'object') {
+    attachRecordingControls(container.querySelector('.verse-container'), formattedBook, chapter, verse);
+  }
+}
+
+// ── The World Reads – recording controls ─────────────────────────────────────
+
+function attachRecordingControls(verseEl, book, chapter, verse) {
+  const rec = window.WDRecorder;
+  const player = window.WDPlayer;
+
+  // Resolve persistent reader ID
+  const readerId = rec.getOrCreateUserId();
+
+  // Track current recording state
+  let selectedLang = null;
+  let lastBlob = null;
+
+  // ── DOM ──────────────────────────────────────────────────────────────────────
+
+  // Language badge (circular icon)
+  const badge = document.createElement('span');
+  badge.className = 'wr-lang-badge no-lang';
+  badge.title = 'Recording language';
+  badge.textContent = '—';
+
+  // Record / Stop button
+  const btnRecord = document.createElement('button');
+  btnRecord.className = 'wr-btn';
+  btnRecord.textContent = '⏺ Record';
+  btnRecord.title = 'Record your reading of this verse';
+
+  // Play button
+  const btnPlay = document.createElement('button');
+  btnPlay.className = 'wr-btn';
+  btnPlay.textContent = '▶ Play';
+  btnPlay.title = 'Play a community recording of this verse';
+  btnPlay.disabled = true;
+
+  // Submit button (no-op for now)
+  const btnSubmit = document.createElement('button');
+  btnSubmit.className = 'wr-btn wr-btn-submit';
+  btnSubmit.textContent = '↑ Submit';
+  btnSubmit.title = 'Submit recording to the pipeline (coming soon)';
+  btnSubmit.disabled = true;
+
+  // Controls row
+  const controls = document.createElement('div');
+  controls.className = 'wr-controls';
+  controls.appendChild(badge);
+  controls.appendChild(btnRecord);
+  controls.appendChild(btnPlay);
+  controls.appendChild(btnSubmit);
+
+  // Reader-ID hint
+  const idHint = document.createElement('div');
+  idHint.className = 'wr-reader-id';
+  idHint.textContent = 'Your reader ID: ';
+  const idSpan = document.createElement('span');
+  idSpan.textContent = readerId;
+  idHint.appendChild(idSpan);
+
+  // Status line
+  const status = document.createElement('div');
+  status.className = 'wr-status';
+
+  verseEl.appendChild(controls);
+  verseEl.appendChild(idHint);
+  verseEl.appendChild(status);
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  function setStatus(msg) { status.textContent = msg; }
+
+  function updateBadge(lang) {
+    if (!lang) {
+      badge.textContent = '—';
+      badge.className = 'wr-lang-badge no-lang';
+      badge.title = 'Recording language';
+    } else {
+      badge.textContent = lang.toUpperCase();
+      badge.className = 'wr-lang-badge';
+      badge.title = 'Language: ' + lang.toUpperCase();
+    }
+  }
+
+  async function refreshPlayButton(lang) {
+    if (!lang) { btnPlay.disabled = true; return; }
+    const files = await player.listAudioFiles(lang, book, chapter, verse);
+    btnPlay.disabled = files.length === 0;
+    if (files.length === 0) {
+      btnPlay.title = 'No recordings available for this verse in ' + lang.toUpperCase();
+    } else {
+      btnPlay.title = 'Play a community recording (' + files.length + ' available)';
+    }
+  }
+
+  // ── Event handlers ────────────────────────────────────────────────────────────
+
+  btnRecord.addEventListener('click', async () => {
+    if (rec.isRecording()) {
+      // Stop recording
+      btnRecord.disabled = true;
+      setStatus('Processing…');
+      try {
+        lastBlob = await rec.stopRecording();
+        btnRecord.textContent = '⏺ Record';
+        btnRecord.classList.remove('record-active');
+        btnSubmit.disabled = false;
+        setStatus('Recording ready. Reader ID: ' + readerId);
+      } finally {
+        btnRecord.disabled = false;
+      }
+    } else {
+      // Prompt for language then start recording
+      const lang = await rec.promptLanguage();
+      if (!lang) { setStatus(''); return; }
+
+      selectedLang = lang;
+      updateBadge(lang);
+      lastBlob = null;
+      btnSubmit.disabled = true;
+
+      try {
+        await rec.startRecording(lang);
+        btnRecord.textContent = '⏹ Stop';
+        btnRecord.classList.add('record-active');
+        setStatus('Recording…');
+        // Check play availability in background
+        refreshPlayButton(lang);
+      } catch (err) {
+        setStatus('Microphone access denied.');
+        updateBadge(null);
+        selectedLang = null;
+        console.error('Recording start error:', err);
+      }
+    }
+  });
+
+  btnPlay.addEventListener('click', async () => {
+    if (!selectedLang) return;
+    btnPlay.disabled = true;
+    setStatus('Loading audio…');
+    try {
+      const played = await player.playVerse(selectedLang, book, chapter, verse);
+      if (!played) {
+        setStatus('No recordings found for this language.');
+        btnPlay.disabled = true;
+      } else {
+        setStatus('Playing…');
+        btnPlay.disabled = false;
+      }
+    } catch (err) {
+      setStatus('Playback error.');
+      btnPlay.disabled = false;
+      console.error('Playback error:', err);
+    }
+  });
+
+  // Submit does nothing for now
+  btnSubmit.addEventListener('click', (e) => {
+    e.preventDefault();
+    setStatus('Submission pipeline coming soon.');
+  });
 }
