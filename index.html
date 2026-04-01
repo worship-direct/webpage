@@ -7,6 +7,8 @@
   <link rel="preload" href="bible/en/kjv.json" as="fetch" crossorigin="anonymous" />
   <link rel="preload" href="bible/en/asv.json" as="fetch" crossorigin="anonymous" />
   <script src="js/api.js" defer></script>
+  <script src="js/recorder.js" defer></script>
+  <script src="js/player.js" defer></script>
   <script src="js/router.js" defer></script>
   <style>
     body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
@@ -62,6 +64,78 @@
     .version-info .version-number {
       font-weight: bold;
       color: #333;
+    }
+
+    /* ── The World Reads – recording controls ── */
+    .wr-controls {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .wr-btn {
+      padding: .35rem .8rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: .9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      transition: background .15s, opacity .15s;
+    }
+    .wr-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+    .wr-btn.record-active {
+      background: #fee;
+      border-color: #c00;
+      color: #c00;
+    }
+    .wr-btn-submit {
+      background: #eef5ff;
+      border-color: #5588cc;
+      color: #335599;
+    }
+    /* Circular language badge */
+    .wr-lang-badge {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: #4a90d9;
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: .02em;
+      user-select: none;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .wr-lang-badge.no-lang {
+      background: #ccc;
+    }
+    /* Reader-ID hint */
+    .wr-reader-id {
+      font-size: .75rem;
+      color: #888;
+      margin-top: .4rem;
+    }
+    .wr-reader-id span {
+      font-family: monospace;
+      color: #555;
+    }
+    /* Status line below controls */
+    .wr-status {
+      font-size: .8rem;
+      color: #666;
+      margin-top: .3rem;
+      min-height: 1.1em;
     }
   </style>
 </head>
