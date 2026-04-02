@@ -182,8 +182,8 @@ function displayVerse(container, version, book, chapter, verse, text) {
         <a href="${apiUrl}" target="_blank" rel="noopener noreferrer">View in Web Interface</a>
       </div>
       <div style="margin-top: 0.5rem; font-size: 0.9rem;">
-        <a href="${qrUrl}" target="_blank" rel="noopener noreferrer">QR Code for this verse</a> ·
-        <a href="${verseRouteUrl}" target="_blank" rel="noopener noreferrer">Direct verse link</a>
+        <a href="${qrUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open QR code page for this verse">QR Code for this verse</a> |
+        <a href="${verseRouteUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open direct link for this verse">Direct verse link</a>
       </div>
     </div>
   `;
