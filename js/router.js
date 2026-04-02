@@ -3,6 +3,12 @@
 // Pattern: (.+?\S) captures book name using non-greedy match that must end with non-whitespace
 // This prevents "John  " (with trailing space) from being captured as the book name
 const BIBLE_REFERENCE_PATTERN = /^(.+?\S)\s+(\d+)\s+(\d+)$/;
+const DEV_QUERY_PARAM = 'dev';
+const DEV_QUERY_VALUE = '1';
+
+function isDevModeEnabled() {
+  return new URLSearchParams(window.location.search).get(DEV_QUERY_PARAM) === DEV_QUERY_VALUE;
+}
 
 // Helper function to create page title for Bible verses
 function createPageTitle(book, chapter, verse, version) {
@@ -49,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const verse = document.getElementById('verse').value;
     
     if (book && chapter && verse) {
-      const newPath = `/bible/${version}/${book}/${chapter}/${verse}`;
+      const devQuery = isDevModeEnabled() ? `?${DEV_QUERY_PARAM}=${DEV_QUERY_VALUE}` : '';
+      const newPath = `/bible/${version}/${book}/${chapter}/${verse}${devQuery}`;
       history.pushState(null, '', newPath);
       fetchVerse(version, book, chapter, verse);
     }
@@ -163,6 +170,8 @@ function displayVerse(container, version, book, chapter, verse, text) {
   const apiUrl = (typeof window.generateApiUrl === 'function') 
     ? window.generateApiUrl(version, formattedBook, chapter, verse)
     : `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(formattedBook + ' ' + chapter + ' ' + verse)}&format=web`;
+  const verseRouteUrl = `${window.location.origin}/bible/${version}/${encodeURIComponent(String(book).toLowerCase())}/${encodeURIComponent(String(chapter))}/${encodeURIComponent(String(verse))}`;
+  const qrUrl = `${window.location.origin}/qr.html?page=${encodeURIComponent(`bible/${version}/${String(book).toLowerCase()}/${chapter}/${verse}`)}`;
   
   container.innerHTML = `
     <div class="verse-container">
@@ -172,11 +181,15 @@ function displayVerse(container, version, book, chapter, verse, text) {
       <div style="margin-top: 1rem; font-size: 0.9rem;">
         <a href="${apiUrl}" target="_blank" rel="noopener noreferrer">View in Web Interface</a>
       </div>
+      <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+        <a href="${qrUrl}" target="_blank" rel="noopener noreferrer">QR Code for this verse</a> ·
+        <a href="${verseRouteUrl}" target="_blank" rel="noopener noreferrer">Direct verse link</a>
+      </div>
     </div>
   `;
 
-  // Attach recording controls if recorder/player modules are loaded
-  if (typeof window.WDRecorder === 'object' && typeof window.WDPlayer === 'object') {
+  // Attach recording controls only in development mode
+  if (isDevModeEnabled() && typeof window.WDRecorder === 'object' && typeof window.WDPlayer === 'object') {
     attachRecordingControls(container.querySelector('.verse-container'), formattedBook, chapter, verse);
   }
 }

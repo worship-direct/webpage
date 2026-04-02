@@ -66,6 +66,23 @@
       color: #333;
     }
 
+    /* Development banner */
+    .dev-banner {
+      display: none;
+      background: #fff3cd;
+      border: 1px solid #ffe69c;
+      color: #664d03;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      text-align: center;
+      font-weight: 600;
+    }
+    .dev-banner a {
+      color: #664d03;
+      text-decoration: underline;
+    }
+
     /* ── The World Reads – recording controls ── */
     .wr-controls {
       display: flex;
@@ -140,6 +157,10 @@
   </style>
 </head>
 <body>
+  <div id="dev-banner" class="dev-banner">
+    Dev mode enabled — <a href="/dev.html?dev=1">Open The World Reads (development)</a>
+  </div>
+
   <div class="logo-container" id="logo-container">
     <!-- Logo loaded from icon.html -->
     <noscript>
@@ -189,6 +210,13 @@
   </div>
   
   <script>
+    // Toggle development-only banner
+    const isDevMode = new URLSearchParams(window.location.search).get('dev') === '1';
+    if (isDevMode) {
+      const devBanner = document.getElementById('dev-banner');
+      if (devBanner) devBanner.style.display = 'block';
+    }
+
     // Load logo from icon.html
     fetch('icon.html')
       .then(response => response.text())
