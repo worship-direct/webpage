@@ -10,6 +10,14 @@ function isDevModeEnabled() {
   return new URLSearchParams(window.location.search).get(DEV_QUERY_PARAM) === DEV_QUERY_VALUE;
 }
 
+function buildVersePath(version, book, chapter, verse) {
+  const normalizedVersion = String(version).toLowerCase();
+  const normalizedBook = String(book).toLowerCase();
+  const normalizedChapter = String(chapter);
+  const normalizedVerse = String(verse);
+  return `bible/${normalizedVersion}/${normalizedBook}/${normalizedChapter}/${normalizedVerse}`;
+}
+
 // Helper function to create page title for Bible verses
 function createPageTitle(book, chapter, verse, version) {
   return `${capitalizeBookName(book)} ${chapter}:${verse} (${version.toUpperCase()}) - Worship Direct`;
@@ -170,8 +178,9 @@ function displayVerse(container, version, book, chapter, verse, text) {
   const apiUrl = (typeof window.generateApiUrl === 'function') 
     ? window.generateApiUrl(version, formattedBook, chapter, verse)
     : `${window.location.origin}/bible/en/${version}.html?ref=${encodeURIComponent(formattedBook + ' ' + chapter + ' ' + verse)}&format=web`;
-  const verseRouteUrl = `${window.location.origin}/bible/${version}/${encodeURIComponent(String(book).toLowerCase())}/${encodeURIComponent(String(chapter))}/${encodeURIComponent(String(verse))}`;
-  const qrUrl = `${window.location.origin}/qr.html?page=${encodeURIComponent(`bible/${version}/${String(book).toLowerCase()}/${chapter}/${verse}`)}`;
+  const versePath = buildVersePath(version, book, chapter, verse);
+  const verseRouteUrl = `${window.location.origin}/${encodeURI(versePath)}`;
+  const qrUrl = `${window.location.origin}/qr.html?page=${encodeURIComponent(versePath)}`;
   
   container.innerHTML = `
     <div class="verse-container">
