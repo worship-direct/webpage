@@ -82,6 +82,17 @@
       color: #664d03;
       text-decoration: underline;
     }
+    .dev-features {
+      display: none;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+      margin-bottom: 1.25rem;
+    }
+    .dev-features h2 {
+      margin-top: 0;
+    }
 
     /* ── The World Reads – recording controls ── */
     .wr-controls {
@@ -158,7 +169,16 @@
 </head>
 <body>
   <div id="dev-banner" class="dev-banner">
-    Dev mode enabled — <a href="/dev.html?dev=1">Open The World Reads (development)</a>
+    Dev mode enabled — <a href="/THE_WORLD_READS.md">Open The World Reads</a>
+  </div>
+
+  <div id="dev-features" class="dev-features">
+    <h2>Development Features</h2>
+    <ul>
+      <li>Audio recording/playback preview is enabled only in dev mode on verse route pages.</li>
+      <li>Verse pages expose a QR code link via the existing <code>qr.html?page=...</code> structure.</li>
+      <li>Development-only page remains available at <a href="/dev.html?dev=1">/dev.html?dev=1</a>.</li>
+    </ul>
   </div>
 
   <div class="logo-container" id="logo-container">
@@ -215,6 +235,8 @@
     if (isDevMode) {
       const devBanner = document.getElementById('dev-banner');
       if (devBanner) devBanner.style.display = 'block';
+      const devFeatures = document.getElementById('dev-features');
+      if (devFeatures) devFeatures.style.display = 'block';
     }
 
     // Load logo from icon.html
