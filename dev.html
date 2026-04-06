@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worship Direct – Development</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      background: #f9f9f9;
+      color: #222;
+    }
+    .banner {
+      background: #e7f3ff;
+      border: 1px solid #b6d4fe;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    }
+    a { color: #0b57d0; }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <strong>The World Reads:</strong>
+    <a href="/THE_WORLD_READS.md">Open project overview</a>
+  </div>
+
+  <div class="card">
+    <h1>Development Features</h1>
+    <p>This page only appears when opened with <code>?dev=1</code>.</p>
+    <ul>
+      <li>Audio recording/playback preview is enabled only in dev mode on verse route pages.</li>
+      <li>Main lookup can be opened in dev mode at <a href="/?dev=1">/?dev=1</a>.</li>
+      <li>Verse pages expose a QR code link via the existing <code>qr.html?page=...</code> structure.</li>
+    </ul>
+  </div>
+
+  <script>
+    const isDev = new URLSearchParams(window.location.search).get('dev') === '1';
+    if (!isDev) {
+      window.location.replace('/');
+    }
+  </script>
+</body>
+</html>

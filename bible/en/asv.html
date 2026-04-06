@@ -125,6 +125,22 @@
       return params.get('format') === 'widget';
     }
 
+    function buildReferenceString(ref) {
+      if (ref.isRange) {
+        if (ref.startChapter === ref.endChapter) {
+          return `${ref.book} ${ref.startChapter}:${ref.startVerse}-${ref.endVerse}`;
+        }
+        return `${ref.book} ${ref.startChapter}:${ref.startVerse} - ${ref.endChapter}:${ref.endVerse}`;
+      }
+      return `${ref.book} ${ref.startChapter}:${ref.startVerse}`;
+    }
+
+    function buildQrLinkForReference(ref) {
+      const refQuery = encodeURIComponent(buildReferenceString(ref));
+      const targetPath = `bible/en/asv.html?ref=${refQuery}&format=web`;
+      return `/qr.html?page=${encodeURIComponent(targetPath)}`;
+    }
+
     // Parse URL parameters to get the verse reference
     function parseUrlParameters() {
       const path = window.location.pathname;
@@ -330,18 +346,15 @@
       });
       
       // Create reference string
-      let refString;
-      if (ref.isRange) {
-        if (ref.startChapter === ref.endChapter) {
-          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}-${ref.endVerse}`;
-        } else {
-          refString = `${ref.book} ${ref.startChapter}:${ref.startVerse} - ${ref.endChapter}:${ref.endVerse}`;
-        }
-      } else {
-        refString = `${ref.book} ${ref.startChapter}:${ref.startVerse}`;
-      }
+      const refString = buildReferenceString(ref);
+      const qrUrl = buildQrLinkForReference(ref);
+      const verseWebUrl = `?ref=${encodeURIComponent(refString)}&format=web`;
       
       html += `<div class="reference">${refString} (ASV)</div>`;
+      html += `<div style="margin-top: 0.6rem; font-size: 0.95rem;">`;
+      html += `<a href="${qrUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open QR code page for this verse or verse set">QR Code for this verse or verse set</a> | `;
+      html += `<a href="${verseWebUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open direct web link for this verse or verse set">Direct link</a>`;
+      html += `</div>`;
       html += '</div>';
       
       resultDiv.innerHTML = html;

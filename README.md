@@ -9,6 +9,15 @@ The main page provides an interactive verse lookup interface:
 
 ![Main Page](screenshots/main-page.png)
 
+### Development Mode
+- Add `?dev=1` to the main URL to enable development-only UI:
+  - `https://worship.direct/?dev=1`
+- Development-only features include:
+  - Banner link to The World Reads development page
+  - Verse-route recording/playback controls that are intentionally hidden in normal mode
+- Dedicated development page:
+  - `https://worship.direct/dev.html?dev=1`
+
 ### Verse Lookup Result
 Example of looking up John 3:16 (KJV):
 
@@ -57,6 +66,8 @@ The **HTML endpoints** provide both an interactive web interface and a JSON API 
 - **Single verse (hash fragment)**: `kjv.html?format=web#Genesis 1 1` (note: format must be in query string)
 - **Verse ranges (same chapter)**: `kjv.html?ref=Genesis 1:1 - 1:5&format=web` (colon notation for ranges)
 - **Verse ranges (cross-chapter)**: `kjv.html?ref=Genesis 1:1 - 3:1&format=web`
+- **QR code for any verse/set**: use `qr.html?page=` with an encoded verse page URL path  
+  Example: `https://worship.direct/qr.html?page=bible%2Fen%2Fkjv.html%3Fref%3DJohn%25203%253A16%26format%3Dweb`
 
 #### Output Format Options:
 The HTML endpoints support multiple output formats via the `format` parameter:

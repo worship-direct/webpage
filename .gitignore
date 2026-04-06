@@ -5,3 +5,7 @@ package-lock.json
 
 # Temporary files
 take-screenshots.js
+
+# Python cache
+__pycache__/
+*.pyc
