@@ -5,6 +5,7 @@ const bibleCache = {};
 
 // Expose functions for external use (by the router)
 window.getVerse = getVerse;
+window.getChapter = getChapter;
 window.generateApiUrl = generateApiUrl;
 
 // Event listener is handled by router.js to avoid duplicate handlers
@@ -99,6 +100,52 @@ function getVerse(version, book, chapter, verse, callback) {
     })
     .catch(error => {
       console.error('Error fetching verse:', error);
+      showError(error.message);
+    });
+}
+
+// Core function to fetch an entire chapter
+function getChapter(version, book, chapter, callback) {
+  loadBibleData(version.toLowerCase())
+    .then(bibleData => {
+      const correctBookName = findBookName(bibleData, book);
+      if (!correctBookName) {
+        throw new Error(`Book "${book}" not found in ${version.toUpperCase()}`);
+      }
+
+      const bookData = bibleData[correctBookName];
+      const chapterData = bookData[String(chapter)];
+      if (!chapterData) {
+        throw new Error(`Chapter ${chapter} not found in ${correctBookName}`);
+      }
+
+      // Determine total chapters in this book
+      const totalChapters = Object.keys(bookData).length;
+
+      // Build sorted verse array
+      const verses = Object.keys(chapterData)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .map(v => {
+          const text = chapterData[String(v)];
+          // Remove leading "# " if present (KJV-specific formatting)
+          const cleanText = text && text.startsWith('# ') ? text.substring(2) : text;
+          return { verse: v, text: cleanText };
+        })
+        .filter(v => v.text);
+
+      if (callback && typeof callback === 'function') {
+        callback({
+          version: version.toLowerCase(),
+          book: correctBookName,
+          chapter: String(chapter),
+          verses,
+          totalChapters
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching chapter:', error);
       showError(error.message);
     });
 }

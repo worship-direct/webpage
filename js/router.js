@@ -92,7 +92,7 @@ function handleRoute(path) {
     decodedPath = path;
   }
   
-  // Check if the URL matches the standard pattern: /bible/version/book/chapter/verse
+  // Check if the URL matches the standard verse pattern: /bible/version/book/chapter/verse
   let match = decodedPath.match(/\/bible\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
   
   if (match) {
@@ -106,7 +106,20 @@ function handleRoute(path) {
     
     // Fetch and display the verse
     fetchVerse(version, book, chapter, verse);
-  } else {
+    return;
+  }
+
+  // Check for chapter route: /bible/version/book/chapter or /bible/version/book/chapter/
+  const chapterMatch = decodedPath.match(/\/bible\/([^\/]+)\/([^\/]+)\/(\d+)\/?$/);
+  if (chapterMatch) {
+    const [, version, book, chapter] = chapterMatch;
+    document.getElementById('lookup-form').style.display = 'none';
+    document.title = `${capitalizeBookName(book)} ${chapter} (${version.toUpperCase()}) - Worship Direct`;
+    fetchChapter(version, book, chapter);
+    return;
+  }
+
+  {
     // Check for alternative format: /bible/version/Book Chapter Verse (space-separated)
     match = decodedPath.match(/\/bible\/([^\/]+)\/(.+)/);
     
@@ -131,12 +144,12 @@ function handleRoute(path) {
         return;
       }
     }
-    
-    // Show the form for the homepage
-    document.getElementById('lookup-form').style.display = 'block';
-    document.getElementById('result').innerHTML = '';
-    document.title = "Worship Direct – Bible API";
   }
+    
+  // Show the form for the homepage
+  document.getElementById('lookup-form').style.display = 'block';
+  document.getElementById('result').innerHTML = '';
+  document.title = "Worship Direct – Bible API";
 }
 
 function fetchVerse(version, book, chapter, verse) {
@@ -168,6 +181,87 @@ function fetchVerse(version, book, chapter, verse) {
         console.error('API error:', error);
       });
   }
+}
+
+function fetchChapter(version, book, chapter) {
+  const result = document.getElementById('result');
+  const loadingMsg = document.createElement('p');
+  loadingMsg.textContent = `Loading ${capitalizeBookName(book)} ${chapter} from ${version.toUpperCase()}…`;
+  result.innerHTML = '';
+  result.appendChild(loadingMsg);
+
+  if (typeof window.getChapter === 'function') {
+    window.getChapter(version, book, chapter, (data) => {
+      displayChapter(result, data);
+    });
+  } else {
+    result.innerHTML = `<p class="error">Chapter loading not available.</p>`;
+  }
+}
+
+function displayChapter(container, data) {
+  const { version, book, chapter, verses, totalChapters } = data;
+  const formattedBook = capitalizeBookName(book);
+  const chapNum = parseInt(chapter, 10);
+
+  const prevChapter = chapNum > 1 ? chapNum - 1 : null;
+  const nextChapter = chapNum < totalChapters ? chapNum + 1 : null;
+
+  // Escape user-supplied values for safe HTML insertion
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  const safeBook = esc(formattedBook);
+  const safeVersion = esc(version.toUpperCase());
+
+  const prevUrl = prevChapter !== null ? `/bible/${esc(version)}/${esc(book)}/${prevChapter}/` : null;
+  const nextUrl = nextChapter !== null ? `/bible/${esc(version)}/${esc(book)}/${nextChapter}/` : null;
+
+  const navBar = (id) => {
+    let html = `<div class="chapter-nav" id="${esc(id)}">`;
+    if (prevUrl) {
+      html += `<a href="${prevUrl}" class="chapter-nav-btn chapter-nav-prev" aria-label="Previous chapter">&#8592; ${safeBook} ${prevChapter}</a>`;
+    } else {
+      html += `<span aria-hidden="true"></span>`;
+    }
+    if (nextUrl) {
+      html += `<a href="${nextUrl}" class="chapter-nav-btn chapter-nav-next" aria-label="Next chapter">${safeBook} ${nextChapter} &#8594;</a>`;
+    } else {
+      html += `<span aria-hidden="true"></span>`;
+    }
+    html += `</div>`;
+    return html;
+  };
+
+  let html = `<div class="chapter-container">`;
+  html += `<h2 class="chapter-heading">${safeBook} ${chapNum} <span class="chapter-version">(${safeVersion})</span></h2>`;
+  html += navBar('chapter-nav-top');
+  html += `<div class="chapter-verses">`;
+  for (const v of verses) {
+    html += `<p class="verse"><sup class="verse-number">${v.verse}</sup>${v.text}</p>`;
+  }
+  html += `</div>`;
+  html += navBar('chapter-nav-bottom');
+  html += `<p class="chapter-back"><a href="/">&#8962; Return to verse lookup</a></p>`;
+  html += `</div>`;
+
+  container.innerHTML = html;
+  document.title = `${formattedBook} ${chapter} (${version.toUpperCase()}) - Worship Direct`;
+
+  // Intercept nav link clicks for SPA-style navigation
+  container.querySelectorAll('.chapter-nav-btn').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      history.pushState(null, '', href);
+      handleRoute(href);
+    });
+  });
 }
 
 function displayVerse(container, version, book, chapter, verse, text) {
