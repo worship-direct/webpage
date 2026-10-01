@@ -1,30 +1,22 @@
-<svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="worship.direct - providing tools to spread the word of God">
-  <title>worship.direct - providing tools to spread the word of God</title>
-  
-  <!-- 3D Bible icon at 45 degrees -->
-  <g transform="translate(40, 20)">
-    <!-- Back cover (thick lines) -->
-    <line x1="13.75" y1="15" x2="28.75" y2="20" stroke="#666" stroke-width="2"/>
+<svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bible Icon">
+  <title>Bible</title>
+  <g transform="translate(20, 15)">
+    <!-- Pages background -->
+    <path d="M 50 15 L 50 65 Q 40 65 30 60 C 20 55 15 50 15 50 L 15 0 C 15 0 20 5 30 10 Q 40 15 50 15 Z" fill="#eaeaea" />
+    <path d="M 50 15 L 50 65 Q 60 65 70 60 C 80 55 85 50 85 50 L 85 0 C 85 0 80 5 70 10 Q 60 15 50 15 Z" fill="#eaeaea" />
 
-    <line x1="28.75" y1="20" x2="28.75" y2="50" stroke="#666" stroke-width="2"/>
-    <!-- Bottom edge of front cover-->
-    <line x1="28.75" y1="50" x2="23.75" y2="48.5" stroke="#666" stroke-width="2"/>
+    <!-- Cover -->
+    <path d="M 50 17 L 50 72 Q 40 72 30 67 C 15 60 12 56 12 56 L 12 5 C 12 5 15 9 30 16 Q 40 21 50 21" fill="#335599" stroke="#224488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 50 17 L 50 72 Q 60 72 70 67 C 85 60 88 56 88 56 L 88 5 C 88 5 85 9 70 16 Q 60 21 50 21" fill="#335599" stroke="#224488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 
-    <!-- Front Cover -->
-  
-    <line x1="8.75" y1="20" x2="23.75" y2="25" stroke="#666" stroke-width="2"/>
+    <!-- Pages (Lines) -->
+    <path d="M 14 53 C 14 53 18 57 30 63 Q 40 68 50 68 Q 60 68 70 63 C 82 57 86 53 86 53" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 13 54.5 C 13 54.5 16.5 58.5 30 65 Q 40 70 50 70 Q 60 70 70 65 C 83.5 58.5 87 54.5 87 54.5" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
 
-    <line x1="23.75" y1="25" x2="23.75" y2="55" stroke="#666" stroke-width="2"/>
-    <line x1="8.75" y1="20" x2="8.75" y2="50" stroke="#666" stroke-width="1"/>
-        <line x1="8.75" y1="20" x2="13.75" y2="15" stroke="#666" stroke-width="1"/>
-    <!-- Bottom edge of front cover-->
-    <line x1="23.75" y1="55" x2="8.75" y2="50" stroke="#666" stroke-width="2"/>
+    <!-- Bookmark -->
+    <path d="M 48 18 L 52 18 L 52 45 L 50 42 L 48 45 Z" fill="#c00" />
 
-    <g transform="translate(11.75, 32)">
-      <!-- Vertical part of cross -->
-      <line x1="4" y1="-3" x2="4" y2="10" stroke="#666" stroke-width="1"/>
-      <!-- Horizontal part of cross -->
-      <line x1="1" y1="1" x2="7" y2="3" stroke="#666" stroke-width="1"/>
-    </g>
+    <!-- Cross on left page -->
+    <path d="M 31 25 L 31 40 M 26 30 L 36 30" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
   </g>
 </svg>
