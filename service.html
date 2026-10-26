@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Church Service</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #eaeaea;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .church-name {
+      color: #7f8c8d;
+      font-size: 1.2rem;
+      margin-top: 0;
+    }
+
+    .date {
+      font-style: italic;
+      color: #95a5a6;
+    }
+
+    .service-item {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .service-item h3 {
+      margin-top: 0;
+      color: #34495e;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .item-type {
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      color: #3498db;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .reference {
+      font-weight: bold;
+      color: #e67e22;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      white-space: pre-wrap; /* Preserve line breaks in lyrics/notes */
+    }
+
+    .loading, .error {
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 40px;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <div class="loading">Loading service details...</div>
+  </div>
+
+  <script>
+    // Assuming Huber Heights Church of God is ID 1 (based on our seed)
+    const CHURCH_ID = 1;
+    // For local development, this points to localhost. In production, it would be the Coolify domain.
+    const API_URL = 'http://localhost:3000';
+
+    async function loadService() {
+      const appDiv = document.getElementById('app');
+
+      try {
+        // Fetch church info
+        const churchRes = await fetch(`${API_URL}/api/churches/${CHURCH_ID}`);
+        if (!churchRes.ok) throw new Error('Failed to load church info');
+        const church = await churchRes.json();
+
+        // Fetch latest service
+        const serviceRes = await fetch(`${API_URL}/api/churches/${CHURCH_ID}/services/latest`);
+        if (!serviceRes.ok) throw new Error('Failed to load active service');
+        const service = await serviceRes.json();
+
+        renderService(church, service, appDiv);
+      } catch (error) {
+        console.error(error);
+        appDiv.innerHTML = `<div class="error">
+          <p>Sorry, we couldn't load the service right now.</p>
+          <p>Error: ${error.message}</p>
+        </div>`;
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g,
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    function renderService(church, service, container) {
+      const date = new Date(service.date).toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+
+      let html = `
+        <header>
+          <h1>${escapeHTML(service.title)}</h1>
+          <p class="church-name">${escapeHTML(church.name)}</p>
+          <p class="date">${escapeHTML(date)}</p>
+        </header>
+        <div class="service-order">
+      `;
+
+      if (service.items && service.items.length > 0) {
+        service.items.forEach(item => {
+          html += `
+            <div class="service-item">
+              <span class="item-type">${escapeHTML(item.type)}</span>
+              <h3>${escapeHTML(item.title)}</h3>
+              ${item.reference ? `<p class="reference">${escapeHTML(item.reference)}</p>` : ''}
+              ${item.content ? `<div class="content">${escapeHTML(item.content)}</div>` : ''}
+            </div>
+          `;
+        });
+      } else {
+        html += `<p>No items scheduled for this service yet.</p>`;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadService);
+  </script>
+</body>
+</html>
