@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ProviderAdmin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Church {
+  id            Int           @id @default(autoincrement())
+  name          String
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  latitude      Float?
+  longitude     Float?
+  isActive      Boolean       @default(false) // Needs manual activation
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  admins        ChurchAdmin[]
+  services      Service[]
+}
+
+model ChurchAdmin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  churchId  Int
+  church    Church   @relation(fields: [churchId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id          Int           @id @default(autoincrement())
+  title       String
+  date        DateTime
+  isActive    Boolean       @default(false)
+  churchId    Int
+  church      Church        @relation(fields: [churchId], references: [id])
+  items       ServiceItem[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ServiceItem {
+  id          Int      @id @default(autoincrement())
+  type        String   // e.g., 'SONG', 'SCRIPTURE', 'ANNOUNCEMENT', 'SERMON'
+  title       String
+  content     String?  // Could be lyrics, sermon notes, etc.
+  reference   String?  // e.g., 'John 3:16' for scripture, or a URL for a file
+  order       Int      // For sorting items within a service
+  serviceId   Int
+  service     Service  @relation(fields: [serviceId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

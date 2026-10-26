@@ -1,7 +1,5 @@
 # Node.js
 node_modules/
-package.json
-package-lock.json
 
 # Temporary files
 take-screenshots.js
@@ -9,3 +7,15 @@ take-screenshots.js
 # Python cache
 __pycache__/
 *.pyc
+.env
+
+backend/dist/
+backend/**/*.js
+backend/**/*.js.map
+backend/**/*.d.ts
+backend/**/*.d.ts.map
+backend/.agents
+backend/.claude
+backend/.cursor
+backend/.devin
+backend/prisma.config.*
